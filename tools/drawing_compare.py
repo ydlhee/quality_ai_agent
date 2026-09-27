@@ -26,3 +26,17 @@ def compare_revision(old_file, new_file):
             })
 
     return changes
+
+
+def analyze_design_change(old_file, new_file, case_id):
+    changes = compare_revision(old_file, new_file)
+
+    return {
+        "status": "success",
+        "case_id": case_id,
+        "result": {
+            "changes": changes
+        },
+        "evidence": [],
+        "missing_items": []
+    }

@@ -54,3 +54,65 @@ def verify_lots(file_path, affected_lots, nominal, tolerance):
         })
 
     return results
+
+
+def validate_quality(
+    file_path,
+    affected_lots,
+    nominal,
+    tolerance,
+    case_id
+):
+
+    raw_results = verify_lots(
+        file_path,
+        affected_lots,
+        nominal,
+        tolerance
+    )
+
+    results = []
+    evidence = []
+    missing_items = []
+
+    for item in raw_results:
+
+        lot_id = item["lot_id"]
+        decision = item["status"]
+        reason = item["reason"]
+
+        results.append({
+            "lot_id": lot_id,
+            "decision": decision,
+            "reason": reason
+        })
+
+        if decision == "HOLD":
+            missing_items.append({
+                "lot_id": lot_id,
+                "reason": reason
+            })
+
+        elif decision == "PASS":
+            evidence.append({
+                "lot_id": lot_id,
+                "requirement": f"{nominal} ± {tolerance}",
+                "result": "공차 만족"
+            })
+
+        elif decision == "REJECT":
+            evidence.append({
+                "lot_id": lot_id,
+                "requirement": f"{nominal} ± {tolerance}",
+                "result": "공차 초과"
+            })
+
+    return {
+        "status": "success",
+        "case_id": case_id,
+        "result": {
+            "lot_results": results
+        },
+        "evidence": evidence,
+        "missing_items": missing_items
+    }
