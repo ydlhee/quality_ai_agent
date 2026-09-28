@@ -1,69 +1,200 @@
+CHANGE_TYPE_MAP = {
+    "revision":
+        "REVISION_CHANGE",
+
+    "diameter":
+        "DIMENSION_CHANGE",
+
+    "tolerance":
+        "TOLERANCE_CHANGE",
+
+    "material":
+        "MATERIAL_CHANGE",
+
+    "heat_treatment":
+        "HEAT_TREATMENT_CHANGE",
+}
+
+
+FALLBACK_REQUIREMENTS = {
+    "REVISION_CHANGE": {
+        "required_document_type":
+            "DRAWING",
+
+        "description":
+            "변경 전후 도면 Revision 확인"
+    },
+
+    "DIMENSION_CHANGE": {
+        "required_document_type":
+            "INSPECTION_REPORT",
+
+        "description":
+            "변경된 치수의 측정결과 확인"
+    },
+
+    "TOLERANCE_CHANGE": {
+        "required_document_type":
+            "INSPECTION_REPORT",
+
+        "description":
+            "변경된 공차 기준의 측정결과 확인"
+    },
+
+    "MATERIAL_CHANGE": {
+        "required_document_type":
+            "MATERIAL_CERTIFICATE",
+
+        "description":
+            "변경된 재질과 소재성적서 확인"
+    },
+
+    "HEAT_TREATMENT_CHANGE": {
+        "required_document_type":
+            "HEAT_TREATMENT_CERTIFICATE",
+
+        "description":
+            "변경된 열처리 조건과 열처리성적서 확인"
+    }
+}
+
+
+def _load_requirements(
+    change_types
+):
+    try:
+        from database.requirement_repository import (
+            get_required_documents
+        )
+
+        result = (
+            get_required_documents(
+                change_types
+            )
+        )
+
+        if result:
+            return result
+
+    except Exception:
+        pass
+
+
+    result = []
+
+    for change_type in change_types:
+        rule = (
+            FALLBACK_REQUIREMENTS.get(
+                change_type
+            )
+        )
+
+        if rule is None:
+            continue
+
+        result.append({
+            "change_type":
+                change_type,
+
+            "required_document_type":
+                rule[
+                    "required_document_type"
+                ],
+
+            "description":
+                rule[
+                    "description"
+                ]
+        })
+
+    return result
+
+
 def create_validation_plan(
     changes,
-    case_id,
-    expected_heat_no=None
+    case_id
 ):
+    change_types = []
+
+    for change in changes:
+        change_type = (
+            CHANGE_TYPE_MAP.get(
+                change.get(
+                    "item"
+                )
+            )
+        )
+
+        if (
+            change_type
+            and change_type
+            not in change_types
+        ):
+            change_types.append(
+                change_type
+            )
+
+
+    requirements = (
+        _load_requirements(
+            change_types
+        )
+    )
+
 
     tasks = []
 
-    for change in changes:
+    required_documents = []
 
-        item = change["item"]
 
-        # Revision 변경
-        if item == "revision":
-            tasks.append({
-                "type": "revision_check",
-                "required_document": "submitted_document",
-                "description": "제출 문서의 Revision 확인"
-            })
+    for requirement in requirements:
+        document_type = (
+            requirement[
+                "required_document_type"
+            ]
+        )
 
-        # 공차 변경
-        elif item == "tolerance":
-            tasks.append({
-                "type": "dimension_check",
-                "required_document": "inspection_report",
-                "description": "변경된 공차 기준으로 치수 측정값 확인"
-            })
+        if (
+            document_type
+            not in required_documents
+        ):
+            required_documents.append(
+                document_type
+            )
 
-        # 치수 변경
-        elif item == "diameter":
-            tasks.append({
-                "type": "dimension_check",
-                "required_document": "inspection_report",
-                "description": "변경된 치수 기준으로 측정값 확인"
-            })
-
-        # 재질 변경
-        elif item == "material":
-            tasks.append({
-                "type": "material_check",
-                "required_document": "material_certificate",
-                "description": "변경된 재질과 소재성적서 확인"
-            })
-
-        # 열처리 변경
-        elif item == "heat_treatment":
-            tasks.append({
-                "type": "heat_treatment_check",
-                "required_document": "heat_treatment_certificate",
-                "description": "변경된 열처리 조건과 열처리성적서 확인"
-            })
-
-    # Heat No. 추적이 필요한 Case
-    if expected_heat_no is not None:
         tasks.append({
-            "type": "heat_no_check",
-            "required_document": "material_certificate",
-            "description": "요구 Heat No.와 품질문서의 Heat No. 일치 여부 확인"
+            "change_type":
+                requirement[
+                    "change_type"
+                ],
+
+            "required_document":
+                document_type,
+
+            "description":
+                requirement.get(
+                    "description",
+                    ""
+                )
         })
+
 
     return {
         "status": "success",
-        "case_id": case_id,
+        "case_id":
+            case_id,
+
         "result": {
-            "validation_tasks": tasks
+            "change_types":
+                change_types,
+
+            "validation_tasks":
+                tasks,
+
+            "required_documents":
+                required_documents
         },
+
         "evidence": [],
         "missing_items": []
     }

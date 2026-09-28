@@ -1,361 +1,410 @@
-import csv
+from tools.drawing_compare import (
+    analyze_design_change,
+)
+
+from tools.verification_plan import (
+    create_validation_plan,
+)
+
+from tools.quality_data import (
+    get_case_id,
+    get_lot,
+    extract_requirements,
+    extract_actual_values,
+    get_received_document_types,
+    normalize_required_documents,
+)
+
+from tools.quality_rules import (
+    evaluate_quality,
+)
 
 
-def verify_lots(
-    file_path,
+def _extract_target_lots(
     affected_lots,
-    nominal,
-    tolerance,
-    expected_revision=None,
-    expected_material=None,
-    expected_heat_treatment=None,
-    expected_heat_no=None
+    default_lot_no
 ):
+    if affected_lots is None:
+        return [
+            default_lot_no
+        ]
 
-    results = []
+    result = []
 
-    with open(file_path, "r", encoding="utf-8") as file:
-        reader = csv.DictReader(file)
+    for item in affected_lots:
 
-        inspection_data = {
-            row["lot_id"]: row
-            for row in reader
-        }
-
-    for lot_id in affected_lots:
-
-        row = inspection_data.get(lot_id)
-
-        # ======================================
-        # 1. 검사자료 없음
-        # ======================================
-        if row is None:
-
-            results.append({
-                "lot_id": lot_id,
-                "status": "HOLD",
-                "issue_code": "INSPECTION_DATA_MISSING",
-                "reason": "검사자료 없음",
-                "requirement": "검사자료 제출",
-                "actual_value": None
-            })
-
-            continue
-
-
-        # ======================================
-        # 2. Revision 검증
-        # ======================================
-        if expected_revision is not None:
-
-            document_revision = row.get(
-                "document_revision",
-                ""
+        if isinstance(item, dict):
+            lot_no = (
+                item.get(
+                    "lot_no"
+                )
+                or item.get(
+                    "lot_id"
+                )
             )
-
-            if document_revision != expected_revision:
-
-                results.append({
-                    "lot_id": lot_id,
-                    "status": "HOLD",
-                    "issue_code": "REVISION_MISMATCH",
-                    "reason": (
-                        f"문서 Revision 불일치 "
-                        f"(요구: {expected_revision}, "
-                        f"실제: {document_revision})"
-                    ),
-                    "requirement": expected_revision,
-                    "actual_value": document_revision
-                })
-
-                continue
-
-
-        # ======================================
-        # 3. 문서 Lot 번호 검증
-        # ======================================
-        document_lot_id = row.get(
-            "document_lot_id",
-            ""
-        )
-
-        if (
-            document_lot_id != ""
-            and document_lot_id != lot_id
-        ):
-
-            results.append({
-                "lot_id": lot_id,
-                "status": "HOLD",
-                "issue_code": "LOT_ID_MISMATCH",
-                "reason": (
-                    f"Lot 번호 불일치 "
-                    f"(대상 Lot: {lot_id}, "
-                    f"문서 Lot: {document_lot_id})"
-                ),
-                "requirement": lot_id,
-                "actual_value": document_lot_id
-            })
-
-            continue
-
-
-        # ======================================
-        # 4. Heat No. 검증
-        # ======================================
-        if expected_heat_no is not None:
-
-            actual_heat_no = row.get(
-                "heat_no",
-                ""
-            )
-
-            if actual_heat_no == "":
-
-                results.append({
-                    "lot_id": lot_id,
-                    "status": "HOLD",
-                    "issue_code": "HEAT_NO_MISSING",
-                    "reason": "Heat No. 정보 없음",
-                    "requirement": expected_heat_no,
-                    "actual_value": None
-                })
-
-                continue
-
-            if actual_heat_no != expected_heat_no:
-
-                results.append({
-                    "lot_id": lot_id,
-                    "status": "HOLD",
-                    "issue_code": "HEAT_NO_MISMATCH",
-                    "reason": (
-                        f"Heat No. 불일치 "
-                        f"(요구: {expected_heat_no}, "
-                        f"실제: {actual_heat_no})"
-                    ),
-                    "requirement": expected_heat_no,
-                    "actual_value": actual_heat_no
-                })
-
-                continue
-
-
-        # ======================================
-        # 5. 재질 검증
-        # ======================================
-        if expected_material is not None:
-
-            actual_material = row.get(
-                "material",
-                ""
-            )
-
-            if actual_material == "":
-
-                results.append({
-                    "lot_id": lot_id,
-                    "status": "HOLD",
-                    "issue_code": "MATERIAL_DATA_MISSING",
-                    "reason": "재질 정보 없음",
-                    "requirement": expected_material,
-                    "actual_value": None
-                })
-
-                continue
-
-            if actual_material != expected_material:
-
-                results.append({
-                    "lot_id": lot_id,
-                    "status": "REJECT",
-                    "issue_code": "MATERIAL_MISMATCH",
-                    "reason": (
-                        f"재질 불일치 "
-                        f"(요구: {expected_material}, "
-                        f"실제: {actual_material})"
-                    ),
-                    "requirement": expected_material,
-                    "actual_value": actual_material
-                })
-
-                continue
-
-
-        # ======================================
-        # 6. 열처리 검증
-        # ======================================
-        if expected_heat_treatment is not None:
-
-            actual_heat_treatment = row.get(
-                "heat_treatment",
-                ""
-            )
-
-            if actual_heat_treatment == "":
-
-                results.append({
-                    "lot_id": lot_id,
-                    "status": "HOLD",
-                    "issue_code": "HEAT_TREATMENT_DATA_MISSING",
-                    "reason": "열처리 정보 없음",
-                    "requirement": expected_heat_treatment,
-                    "actual_value": None
-                })
-
-                continue
-
-            if (
-                actual_heat_treatment
-                != expected_heat_treatment
-            ):
-
-                results.append({
-                    "lot_id": lot_id,
-                    "status": "REJECT",
-                    "issue_code": "HEAT_TREATMENT_MISMATCH",
-                    "reason": (
-                        f"열처리 조건 불일치 "
-                        f"(요구: {expected_heat_treatment}, "
-                        f"실제: {actual_heat_treatment})"
-                    ),
-                    "requirement": expected_heat_treatment,
-                    "actual_value": actual_heat_treatment
-                })
-
-                continue
-
-
-        # ======================================
-        # 7. 측정값 없음
-        # ======================================
-        if row.get("diameter", "") == "":
-
-            results.append({
-                "lot_id": lot_id,
-                "status": "HOLD",
-                "issue_code": "MEASUREMENT_MISSING",
-                "reason": "측정값 없음",
-                "requirement": f"{nominal} ± {tolerance}",
-                "actual_value": None
-            })
-
-            continue
-
-
-        # ======================================
-        # 8. 치수 / 공차 검증
-        # ======================================
-        measured = float(
-            row["diameter"]
-        )
-
-        lower = nominal - tolerance
-        upper = nominal + tolerance
-
-        if lower <= measured <= upper:
-
-            results.append({
-                "lot_id": lot_id,
-                "status": "PASS",
-                "issue_code": "NO_ISSUE",
-                "reason": "공차 만족",
-                "requirement": f"{nominal} ± {tolerance}",
-                "actual_value": measured
-            })
 
         else:
+            lot_no = item
 
-            results.append({
-                "lot_id": lot_id,
-                "status": "REJECT",
-                "issue_code": "DIMENSION_OUT_OF_TOLERANCE",
-                "reason": (
-                    f"공차 초과 "
-                    f"(요구: {nominal} ± {tolerance}, "
-                    f"실제: {measured})"
-                ),
-                "requirement": f"{nominal} ± {tolerance}",
-                "actual_value": measured
-            })
+        if lot_no:
+            result.append(
+                lot_no
+            )
 
-    return results
+    return result
 
 
 def validate_quality(
-    file_path,
-    affected_lots,
-    nominal,
-    tolerance,
-    case_id,
-    expected_revision=None,
-    expected_material=None,
-    expected_heat_treatment=None,
-    expected_heat_no=None
+    case_data,
+    affected_lots=None,
+    case_id=None,
+    required_documents=None
 ):
-
-    raw_results = verify_lots(
-        file_path,
-        affected_lots,
-        nominal,
-        tolerance,
-        expected_revision,
-        expected_material,
-        expected_heat_treatment,
-        expected_heat_no
+    resolved_case_id = (
+        case_id
+        or get_case_id(
+            case_data
+        )
     )
 
-    results = []
-    evidence = []
+    lot = get_lot(
+        case_data
+    )
+
+
+    # ==================================
+    # Lot 정보 없음
+    # ==================================
+
+    if lot is None:
+        return {
+            "status": "success",
+            "case_id":
+                resolved_case_id,
+
+            "result": {
+                "lot_results": []
+            },
+
+            "evidence": [],
+
+            "missing_items": [
+                {
+                    "item": "LOT",
+                    "reason":
+                        "Case에 연결된 Lot 정보 없음"
+                }
+            ]
+        }
+
+
+    lot_no = lot.get(
+        "lot_no"
+    )
+
+
+    target_lots = (
+        _extract_target_lots(
+            affected_lots,
+            lot_no
+        )
+    )
+
+
+    # Effectivity 범위 밖
+    if lot_no not in target_lots:
+        return {
+            "status": "success",
+            "case_id":
+                resolved_case_id,
+
+            "result": {
+                "lot_results": []
+            },
+
+            "evidence": [],
+
+            "missing_items": []
+        }
+
+
+    # ==================================
+    # 설계변경 분석
+    # ==================================
+
+    design_result = (
+        analyze_design_change(
+            case_data,
+            resolved_case_id
+        )
+    )
+
+    changes = (
+        design_result[
+            "result"
+        ].get(
+            "changes",
+            []
+        )
+    )
+
+
+    requirements = (
+        design_result[
+            "result"
+        ].get(
+            "requirements"
+        )
+    )
+
+
+    # 혹시 drawing_compare에서
+    # requirements를 못 만든 경우
+    if not requirements:
+        (
+            requirements,
+            requirement_evidence
+        ) = extract_requirements(
+            case_data
+        )
+    else:
+        requirement_evidence = (
+            design_result.get(
+                "evidence",
+                []
+            )
+        )
+
+
+    # ==================================
+    # 검증계획 / 필수문서
+    # ==================================
+
+    plan_result = (
+        create_validation_plan(
+            changes,
+            resolved_case_id
+        )
+    )
+
+
+    if required_documents is None:
+        required_documents = (
+            plan_result[
+                "result"
+            ].get(
+                "required_documents",
+                []
+            )
+        )
+
+
+    required_documents = (
+        normalize_required_documents(
+            required_documents
+        )
+    )
+
+
+    received_documents = (
+        get_received_document_types(
+            case_data
+        )
+    )
+
+
+    missing_documents = [
+        document_type
+        for document_type
+        in required_documents
+        if document_type
+        not in received_documents
+    ]
+
+
+    # ==================================
+    # 필수문서 누락 → HOLD
+    # ==================================
+
+    if missing_documents:
+
+        reason = (
+            "필수 품질문서 누락: "
+            + ", ".join(
+                missing_documents
+            )
+        )
+
+        lot_result = {
+            "lot_id":
+                lot_no,
+
+            "decision":
+                "HOLD",
+
+            "issue_code":
+                "REQUIRED_DOCUMENT_MISSING",
+
+            "reason":
+                reason,
+
+            "requirement":
+                missing_documents,
+
+            "actual_value":
+                sorted(
+                    received_documents
+                )
+        }
+
+
+        missing_items = [
+            {
+                "lot_id":
+                    lot_no,
+
+                "issue_code":
+                    "REQUIRED_DOCUMENT_MISSING",
+
+                "document_type":
+                    document_type,
+
+                "reason":
+                    f"{document_type} 누락"
+            }
+            for document_type
+            in missing_documents
+        ]
+
+
+        return {
+            "status": "success",
+            "case_id":
+                resolved_case_id,
+
+            "result": {
+                "lot_results": [
+                    lot_result
+                ],
+
+                "required_documents":
+                    required_documents
+            },
+
+            "evidence":
+                requirement_evidence,
+
+            "missing_items":
+                missing_items
+        }
+
+
+    # ==================================
+    # 실제 품질 데이터 추출
+    # ==================================
+
+    actual, actual_evidence = (
+        extract_actual_values(
+            case_data
+        )
+    )
+
+
+    # ==================================
+    # Rule 기반 품질판정
+    # ==================================
+
+    rule_result = (
+        evaluate_quality(
+            requirements,
+            actual,
+            required_documents
+        )
+    )
+
+
+    lot_result = {
+        "lot_id":
+            lot_no,
+
+        "decision":
+            rule_result[
+                "decision"
+            ],
+
+        "issue_code":
+            rule_result[
+                "issue_code"
+            ],
+
+        "reason":
+            rule_result[
+                "reason"
+            ],
+
+        "requirement":
+            rule_result[
+                "requirement"
+            ],
+
+        "actual_value":
+            rule_result[
+                "actual_value"
+            ]
+    }
+
+
     missing_items = []
 
-    for item in raw_results:
 
-        lot_id = item["lot_id"]
-        decision = item["status"]
-        issue_code = item["issue_code"]
-        reason = item["reason"]
+    if (
+        rule_result[
+            "decision"
+        ]
+        == "HOLD"
+    ):
+        missing_items.append({
+            "lot_id":
+                lot_no,
 
-        requirement = item.get(
-            "requirement"
-        )
+            "issue_code":
+                rule_result[
+                    "issue_code"
+                ],
 
-        actual_value = item.get(
-            "actual_value"
-        )
-
-        results.append({
-            "lot_id": lot_id,
-            "decision": decision,
-            "issue_code": issue_code,
-            "reason": reason,
-            "requirement": requirement,
-            "actual_value": actual_value
+            "reason":
+                rule_result[
+                    "reason"
+                ]
         })
 
-        evidence.append({
-            "lot_id": lot_id,
-            "issue_code": issue_code,
-            "requirement": requirement,
-            "actual_value": actual_value,
-            "decision": decision,
-            "reason": reason
-        })
 
-        if decision == "HOLD":
+    evidence = (
+        requirement_evidence
+        + actual_evidence
+    )
 
-            missing_items.append({
-                "lot_id": lot_id,
-                "issue_code": issue_code,
-                "reason": reason
-            })
 
     return {
         "status": "success",
-        "case_id": case_id,
+        "case_id":
+            resolved_case_id,
+
         "result": {
-            "lot_results": results
+            "lot_results": [
+                lot_result
+            ],
+
+            "requirements":
+                requirements,
+
+            "required_documents":
+                required_documents
         },
-        "evidence": evidence,
-        "missing_items": missing_items
+
+        "evidence":
+            evidence,
+
+        "missing_items":
+            missing_items
     }
