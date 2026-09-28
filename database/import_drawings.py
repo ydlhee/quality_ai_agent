@@ -3,7 +3,7 @@ import sqlite3
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-JSON_PATH = ROOT / "data" / "drawings.json"
+JSON_PATH = ROOT / "data" / "parsed" / "drawings" / "drawings_from_pdf.json"
 DB_PATH = ROOT / "database" / "sample_lots.db"
 
 
