@@ -160,6 +160,29 @@ def get_case(case_id):
                         inspection_row["extracted_json"]
                     )
 
+            # 소재성적서 / 열처리성적서 구조화 데이터
+            elif document["document_type"] in (
+                "MATERIAL_CERTIFICATE",
+                "HEAT_TREATMENT_CERTIFICATE",
+            ):
+                certificate_row = conn.execute(
+                    """
+                    SELECT extracted_json
+                    FROM quality_certificates
+                    WHERE source_file = ?
+                      AND lot_no = ?
+                    """,
+                    (
+                        document["file_name"],
+                        case_data["lot_no"],
+                    ),
+                ).fetchone()
+
+                if certificate_row is not None:
+                    structured_data = json.loads(
+                        certificate_row["extracted_json"]
+                    )
+
             document["structured_data"] = structured_data
 
             documents.append(document)
@@ -171,8 +194,6 @@ def get_case(case_id):
             case_dir / "initial_email.json"
         )
 
-        # SUPPLEMENTAL 문서가 실제 DB에 등록된 경우에만
-        # 보완메일도 수신된 것으로 처리
         has_supplemental = any(
             document["document_stage"] == "SUPPLEMENTAL"
             for document in documents

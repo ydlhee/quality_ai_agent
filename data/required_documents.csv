@@ -1,0 +1,6 @@
+change_type,required_document_type,description
+REVISION_CHANGE,DRAWING,변경 전후 도면 Revision 확인
+DIMENSION_CHANGE,INSPECTION_REPORT,변경된 치수의 측정결과 확인
+TOLERANCE_CHANGE,INSPECTION_REPORT,변경된 공차 기준의 측정결과 확인
+MATERIAL_CHANGE,MATERIAL_CERTIFICATE,변경된 재질과 소재성적서 확인
+HEAT_TREATMENT_CHANGE,HEAT_TREATMENT_CERTIFICATE,변경된 열처리 조건과 열처리성적서 확인

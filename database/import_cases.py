@@ -15,6 +15,12 @@ def get_document_type(file_name):
     if file_name.startswith("INS-"):
         return "INSPECTION_REPORT"
 
+    if file_name.startswith("MAT-"):
+        return "MATERIAL_CERTIFICATE"
+
+    if file_name.startswith("HT-"):
+        return "HEAT_TREATMENT_CERTIFICATE"
+
     return "OTHER"
 
 
@@ -60,8 +66,13 @@ def import_cases():
             if not case_dir.is_dir():
                 continue
 
-            case_json_path = case_dir / "case.json"
-            email_json_path = case_dir / "initial_email.json"
+            case_json_path = (
+                case_dir / "case.json"
+            )
+
+            email_json_path = (
+                case_dir / "initial_email.json"
+            )
 
             case_data = json.loads(
                 case_json_path.read_text(
@@ -132,7 +143,10 @@ def import_cases():
 
         conn.commit()
 
-        print(f"Case {case_count}개 저장 완료")
+        print(
+            f"Case {case_count}개 저장 완료"
+        )
+
         print(
             f"최초 첨부문서 {document_count}개 저장 완료"
         )
@@ -164,6 +178,7 @@ def import_cases():
             SELECT
                 case_id,
                 file_name,
+                document_type,
                 document_stage
             FROM case_documents
             ORDER BY case_id, file_name
@@ -172,7 +187,8 @@ def import_cases():
             print(
                 f"{row[0]} | "
                 f"{row[1]} | "
-                f"{row[2]}"
+                f"{row[2]} | "
+                f"{row[3]}"
             )
 
     finally:
