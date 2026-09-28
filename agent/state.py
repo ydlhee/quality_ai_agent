@@ -1,19 +1,29 @@
 def create_initial_state(case_id: str):
-    """새 품질검증 Case의 초기 상태를 생성한다."""
+    """품질검증 Case의 초기 Agent 상태를 생성한다."""
 
     return {
         "case_id": case_id,
 
+        # Tool 수행 여부
         "design_change_analyzed": False,
         "validation_plan_created": False,
         "impact_traced": False,
         "quality_validated": False,
         "followup_completed": False,
 
+        # Case 진행 상태
+        "case_status": "PROCESSING",
         "decision": None,
+
+        # 재검증 관련 상태
+        "revalidation_required": False,
+        "revalidation_count": 0,
+
+        # 검증 결과
         "missing_items": [],
         "evidence": [],
 
+        # Tool 실행 결과 및 Agent 기록
         "tool_results": {},
         "history": [],
         "agent_trace": []
