@@ -20,6 +20,11 @@ def run_case(case_folder):
     case_id = case_data["case_id"]
     part_id = case_data["part_id"]
     old_revision = case_data["old_revision"]
+    new_revision = case_data["new_revision"]
+    effectivity = case_data.get("effectivity")
+    expected_material = case_data.get("expected_material")
+    expected_heat_treatment = case_data.get("expected_heat_treatment")
+    expected_heat_no = case_data.get("expected_heat_no")
     nominal = case_data["nominal"]
     tolerance = case_data["tolerance"]
     expected_decision = case_data["expected_decision"]
@@ -44,8 +49,9 @@ def run_case(case_folder):
         str(case_folder / "lot.csv"),
         part_id,
         old_revision,
-        case_id
-    )
+        case_id,
+        effectivity=effectivity
+)
 
     affected_lots = [
         lot["lot_id"]
@@ -58,9 +64,12 @@ def run_case(case_folder):
         affected_lots,
         nominal,
         tolerance,
-        case_id
-    )
-
+        case_id,
+        expected_revision=new_revision,
+        expected_material=expected_material,
+        expected_heat_treatment=expected_heat_treatment,
+        expected_heat_no=expected_heat_no
+)
     # 5. 후속조치
     followup_result = handle_followup(
         quality_result,
@@ -104,6 +113,12 @@ base_path = Path("data/test_cases")
 for case_name in [
     "CASE-001",
     "CASE-002",
-    "CASE-003"
+    "CASE-003",
+    "CASE-004",
+    "CASE-005",
+    "CASE-006",
+    "CASE-007",
+    "CASE-008",
+    "CASE-009"
 ]:
     run_case(base_path / case_name)

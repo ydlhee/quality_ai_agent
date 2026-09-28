@@ -1,0 +1,8 @@
+{
+  "part_no": "A1001",
+  "revision": "C",
+  "material": "AL2024",
+  "diameter": 20.0,
+  "tolerance": 0.1,
+  "heat_treatment": "T6"
+}
