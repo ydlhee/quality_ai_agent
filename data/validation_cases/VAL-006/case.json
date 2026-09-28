@@ -1,0 +1,12 @@
+{
+  "case_id": "VAL-006",
+  "part_id": "A1001",
+  "old_revision": "B",
+  "new_revision": "C",
+  "expected_heat_treatment": "T73",
+  "nominal": 20.0,
+  "tolerance": 0.1,
+  "expected_decision": "REJECT",
+  "source_case_id": "CASE-006",
+  "dataset_type": "VALIDATION"
+}

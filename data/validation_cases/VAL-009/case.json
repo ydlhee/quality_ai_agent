@@ -1,0 +1,12 @@
+{
+  "case_id": "VAL-009",
+  "part_id": "A1001",
+  "old_revision": "B",
+  "new_revision": "C",
+  "effectivity": "2026-09-15",
+  "nominal": 20.0,
+  "tolerance": 0.1,
+  "expected_decision": "PASS",
+  "source_case_id": "CASE-009",
+  "dataset_type": "VALIDATION"
+}
