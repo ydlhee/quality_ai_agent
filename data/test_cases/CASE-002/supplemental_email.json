@@ -1,0 +1,12 @@
+{
+  "sender": "quality@sup-002.example.com",
+  "subject": "RE: P-001 / LOT-005 보완자료 제출",
+  "body": "요청하신 보완자료를 추가 제출드립니다.",
+  "supplier_id": "SUP-002",
+  "part_no": "P-001",
+  "po_no": "PO-002",
+  "lot_no": "LOT-005",
+  "attachment_files": [
+    "INS-005.pdf"
+  ]
+}
