@@ -1,0 +1,10 @@
+{
+  "case_id": "CASE-008",
+  "part_id": "A1001",
+  "old_revision": "B",
+  "new_revision": "C",
+  "expected_heat_no": "HEAT-100",
+  "nominal": 20.0,
+  "tolerance": 0.1,
+  "expected_decision": "HOLD"
+}
