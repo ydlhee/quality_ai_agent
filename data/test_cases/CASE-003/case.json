@@ -1,9 +1,10 @@
 {
   "case_id": "CASE-003",
-  "part_id": "A1001",
-  "old_revision": "B",
-  "new_revision": "C",
-  "nominal": 20.0,
-  "tolerance": 0.1,
-  "expected_decision": "REJECT"
+  "part_no": "P-002",
+  "po_no": "PO-003",
+  "lot_no": "LOT-008",
+  "supplier_id": "SUP-001",
+  "supplier_name": "경남정밀",
+  "drawing_revision": "C",
+  "case_status": "OPEN"
 }
