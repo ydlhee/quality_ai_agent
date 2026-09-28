@@ -4,7 +4,7 @@ import streamlit as st
 from dotenv import load_dotenv
 from openai import OpenAI
 
-from agent.runner import run_mock_case
+from agent.runner import run_case
 from ui.components import (
     show_case_status,
     show_result,
@@ -100,8 +100,7 @@ st.divider()
 st.subheader("품질검증 Case 실행")
 
 st.write(
-    "현재는 실제 품질검증 Tool 연결 전 단계이므로 "
-    "Mock 데이터를 사용하여 전체 실행 흐름을 확인합니다."
+    "설계변경 분석부터 후속조치까지 5개 품질검증 Tool을 실행합니다."
 )
 
 case_id = st.text_input(
@@ -109,9 +108,9 @@ case_id = st.text_input(
     value="CASE-001"
 )
 
-if st.button("Mock 품질검증 실행"):
+if st.button("품질검증 실행"):
 
-    state = run_mock_case(case_id)
+    state = run_case(case_id)
 
     st.divider()
 

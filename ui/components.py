@@ -47,21 +47,31 @@ def show_result(state):
 
 
 def show_followup(state):
-    """후속조치 및 재검증 상태를 표시한다."""
+    """실제 후속조치 Tool 결과를 표시한다."""
 
-    st.subheader("후속조치 및 재검증")
+    st.subheader("후속조치")
 
     followup = state["tool_results"].get("followup")
 
     if not followup:
+        st.write("후속조치 결과가 없습니다.")
+        return
+
+    actions = followup.get("result", {}).get("actions", [])
+
+    if not actions:
         st.write("후속조치가 없습니다.")
         return
 
-    st.write("조치:", followup["action"])
-    st.write("대상:", followup["target"])
-    st.write("요청자료:", followup["requested_document"])
-    st.write("재검증 상태:", followup["revalidation_status"])
+    for item in actions:
+        lot_id = item.get("lot_id", "-")
+        action = item.get("action", "-")
+        description = item.get("description", "-")
 
+        st.write(f"Lot: {lot_id}")
+        st.write(f"조치: {action}")
+        st.write(f"내용: {description}")
+        st.divider()
 
 def show_history(state):
     """Agent의 Tool 실행 이력을 표시한다."""
