@@ -46,6 +46,23 @@ def show_result(state):
     st.write(state["evidence"])
 
 
+def show_followup(state):
+    """후속조치 및 재검증 상태를 표시한다."""
+
+    st.subheader("후속조치 및 재검증")
+
+    followup = state["tool_results"].get("followup")
+
+    if not followup:
+        st.write("후속조치가 없습니다.")
+        return
+
+    st.write("조치:", followup["action"])
+    st.write("대상:", followup["target"])
+    st.write("요청자료:", followup["requested_document"])
+    st.write("재검증 상태:", followup["revalidation_status"])
+
+
 def show_history(state):
     """Agent의 Tool 실행 이력을 표시한다."""
 

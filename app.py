@@ -5,8 +5,12 @@ from dotenv import load_dotenv
 from openai import OpenAI
 
 from agent.runner import run_mock_case
-from ui.components import show_case_status, show_result, show_history
-
+from ui.components import (
+    show_case_status,
+    show_result,
+    show_followup,
+    show_history
+)
 
 # .env 파일 불러오기
 load_dotenv()
@@ -111,15 +115,16 @@ if st.button("Mock 품질검증 실행"):
 
     st.divider()
 
-    # Case 진행 상태
     show_case_status(state)
 
     st.divider()
 
-    # 품질검증 결과
     show_result(state)
 
     st.divider()
 
-    # Agent 실행 이력
+    show_followup(state)
+
+    st.divider()
+
     show_history(state)

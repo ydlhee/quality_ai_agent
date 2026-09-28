@@ -77,5 +77,17 @@ def run_mock_case(case_id: str):
     state["evidence"] = quality_result["evidence"]
     state["tool_results"]["quality"] = quality_result
     state["history"].append("품질검증 완료")
+    # 5. 후속조치 및 재검증
+    followup_result = {
+        "status": "success",
+        "action": "보완자료 요청",
+        "target": "LOT-004",
+        "requested_document": "검사성적서",
+        "revalidation_status": "대기"
+    }
 
+    state["followup_completed"] = True
+    state["tool_results"]["followup"] = followup_result
+    state["history"].append("후속조치 생성 완료")
+    
     return state
