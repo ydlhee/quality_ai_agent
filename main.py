@@ -53,7 +53,8 @@ changes = design_result["result"]["changes"]
 
 plan_result = create_validation_plan(
     changes,
-    case_id
+    case_id,
+    expected_heat_no=expected_heat_no
 )
 
 print("\n===== 2. 검증계획 =====")
@@ -73,6 +74,7 @@ print("\n===== 3. 영향범위 추적 =====")
 print(impact_result)
 
 
+# 영향 Lot ID만 추출
 affected_lots = [
     lot["lot_id"]
     for lot in impact_result["result"]["affected_lots"]
