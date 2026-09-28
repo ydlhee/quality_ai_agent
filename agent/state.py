@@ -15,5 +15,6 @@ def create_initial_state(case_id: str):
         "evidence": [],
 
         "tool_results": {},
-        "history": []
+        "history": [],
+        "agent_trace": []
     }

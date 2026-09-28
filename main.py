@@ -1,7 +1,7 @@
 from tools.drawing_compare import analyze_design_change
 from tools.verification_plan import create_validation_plan
 from tools.lot_trace import trace_impact
-from tools.quality_verify import validate_quality
+from tools.validate_quality import validate_quality
 from tools.followup import handle_followup
 
 
