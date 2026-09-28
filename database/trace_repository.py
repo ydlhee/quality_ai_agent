@@ -120,7 +120,7 @@ def get_trace_by_part(part_no):
 
 
 if __name__ == "__main__":
-    result = get_trace_by_part("P-001")
+    result = get_trace_by_part("P-002")
 
     print(
         json.dumps(
