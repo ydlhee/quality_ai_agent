@@ -276,7 +276,15 @@ def validate_quality(
             in missing_documents
         ]
 
-
+        evidence = [
+            {
+                **item,
+                "lot_id": lot_no,
+                "requirement": lot_result["requirement"],
+                "result": lot_result["decision"]
+            }
+            for item in requirement_evidence
+        ]
         return {
             "status": "success",
             "case_id":
@@ -292,7 +300,7 @@ def validate_quality(
             },
 
             "evidence":
-                requirement_evidence,
+                evidence,
 
             "missing_items":
                 missing_items
@@ -383,6 +391,15 @@ def validate_quality(
         requirement_evidence
         + actual_evidence
     )
+    evidence = [
+        {
+            **item,
+            "lot_id": lot_no,
+            "requirement": lot_result["requirement"],
+            "result": lot_result["decision"]
+        }
+        for item in evidence
+    ]
 
 
     return {
