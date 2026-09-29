@@ -43,7 +43,7 @@ def get_document_path(
     """
     Case 문서의 실제 파일 경로를 반환한다.
 
-    1. Gmail을 통해 생성된 Live Case인 경우
+    1. Gmail을 통해 생성된 Live Case의 경우
        data/mail_attachments/<message_id>/<file_name>
 
     2. Gmail 경로에서 파일을 찾을 수 없는 경우
@@ -94,7 +94,7 @@ def get_document_path(
 
 def get_case(case_id):
     """
-    Case ID 하나를 기준으로
+    Case ID 하나를 기준으로 다음 정보를 조회한다.
 
     - Case 기본정보
     - 메일 정보
@@ -102,8 +102,6 @@ def get_case(case_id):
     - 현재 등록된 문서
     - 문서 구조화 데이터
     - 실제 문서 파일 경로
-
-    를 조회한다.
     """
 
     if not DB_PATH.exists():
@@ -134,7 +132,6 @@ def get_case(case_id):
 
         case_data = dict(case_row)
 
-
         # ====================================================
         # 2. Lot 정보
         # ====================================================
@@ -153,7 +150,6 @@ def get_case(case_id):
             if lot_row is not None
             else None
         )
-
 
         # ====================================================
         # 3. 현재 Case에 등록된 문서 조회
@@ -174,7 +170,6 @@ def get_case(case_id):
         ).fetchall()
 
         documents = []
-
 
         # ====================================================
         # 4. 각 문서의 구조화 데이터 조회
@@ -202,7 +197,6 @@ def get_case(case_id):
             )
 
             structured_data = None
-
 
             # =================================================
             # 도면 구조화 데이터
@@ -232,7 +226,6 @@ def get_case(case_id):
                         structured_data = drawing_data
                         break
 
-
             # =================================================
             # 검사성적서 구조화 데이터
             # =================================================
@@ -260,7 +253,6 @@ def get_case(case_id):
                     structured_data = json.loads(
                         inspection_row["extracted_json"]
                     )
-
 
             # =================================================
             # 소재성적서 / 열처리성적서 구조화 데이터
@@ -290,12 +282,9 @@ def get_case(case_id):
                         certificate_row["extracted_json"]
                     )
 
-
-            # 구조화 데이터 저장
             document["structured_data"] = structured_data
 
             documents.append(document)
-
 
         # ====================================================
         # 5. 기존 테스트 Case 메일 데이터
@@ -306,7 +295,6 @@ def get_case(case_id):
         initial_email = load_json(
             case_dir / "initial_email.json"
         )
-
 
         # ====================================================
         # 6. 보완자료 존재 여부 확인
@@ -325,7 +313,6 @@ def get_case(case_id):
             else None
         )
 
-
         # ====================================================
         # 7. 최종 Case 데이터 반환
         # ====================================================
@@ -338,6 +325,54 @@ def get_case(case_id):
             "documents": documents,
         }
 
+    finally:
+        conn.close()
+
+
+# ============================================================
+# Case 상태 저장
+# ============================================================
+
+def update_case_status(case_id, case_status):
+    """
+    Agent가 결정한 Case 상태를 cases 테이블에 저장한다.
+
+    주요 상태:
+    - OPEN
+    - REVALIDATING
+    - WAITING_FOR_CORRECTION
+    - WAITING_FOR_CORRECTIVE_ACTION
+    - WAITING
+    - COMPLETED
+    """
+
+    if not DB_PATH.exists():
+        raise FileNotFoundError(
+            f"DB가 없습니다: {DB_PATH}"
+        )
+
+    conn = sqlite3.connect(DB_PATH)
+
+    try:
+        cursor = conn.execute(
+            """
+            UPDATE cases
+            SET case_status = ?
+            WHERE case_id = ?
+            """,
+            (case_status, case_id),
+        )
+
+        if cursor.rowcount == 0:
+            raise ValueError(
+                f"Case를 찾을 수 없습니다: {case_id}"
+            )
+
+        conn.commit()
+
+    except Exception:
+        conn.rollback()
+        raise
 
     finally:
         conn.close()

@@ -7,11 +7,21 @@ from tools.lot_trace import trace_impact
 from tools.quality_verify import validate_quality
 from tools.followup import handle_followup
 
-from database.case_repository import get_case
+from database.case_repository import (
+    get_case,
+    update_case_status,
+)
 
 
 def _get_quality_decision(result):
-    """품질검증 결과에서 Case 판정을 계산한다."""
+    """
+    품질검증 결과에서 Case의 최종 품질 판정을 계산한다.
+
+    우선순위:
+    REJECT > HOLD > PASS
+
+    Lot 결과가 없는 비정상 상황은 안전하게 HOLD로 처리한다.
+    """
 
     lot_results = (
         result
@@ -37,9 +47,33 @@ def _get_quality_decision(result):
     return "HOLD"
 
 
+def _save_case_status(state, case_status):
+    """
+    Agent의 메모리 상태와 DB의 Case 상태를 동시에 갱신한다.
+
+    상태 변경을 한 함수에서 처리하여
+    메모리와 DB의 상태 불일치를 방지한다.
+    """
+
+    state["case_status"] = case_status
+
+    update_case_status(
+        state["case_id"],
+        case_status,
+    )
+
+
 def run_case(case_id: str):
     """
     새로운 Case의 최초 품질검증 프로세스를 실행한다.
+
+    기본 흐름:
+    설계변경 분석
+    -> 검증계획 생성
+    -> 영향범위 추적
+    -> 품질검증 및 Risk 판단
+    -> 필요 시 후속조치
+    -> 종료 또는 대기
 
     PASS:
         품질검증 완료 후 Case 종료
@@ -65,15 +99,22 @@ def run_case(case_id: str):
         tool_name = decision["tool"]
         reason = decision["reason"]
 
-        # PASS 등 모든 작업이 완료된 경우
+        # ====================================================
+        # PASS 후 모든 작업이 완료된 경우
+        # ====================================================
+
         if tool_name == "finish":
-            state["case_status"] = "COMPLETED"
+
+            _save_case_status(
+                state,
+                "COMPLETED",
+            )
 
             state["agent_trace"].append({
                 "step": len(state["agent_trace"]) + 1,
                 "tool": "finish",
                 "reason": reason,
-                "result": "COMPLETED"
+                "result": "COMPLETED",
             })
 
             state["history"].append(
@@ -84,8 +125,12 @@ def run_case(case_id: str):
 
             break
 
-        # HOLD / REJECT 후 외부 자료를 기다리는 경우
+        # ====================================================
+        # HOLD / REJECT 후 자료를 기다리는 경우
+        # ====================================================
+
         if tool_name == "wait":
+
             if state["decision"] == "HOLD":
                 wait_status = "WAITING_FOR_CORRECTION"
 
@@ -95,14 +140,18 @@ def run_case(case_id: str):
             else:
                 wait_status = "WAITING"
 
-            state["case_status"] = wait_status
+            _save_case_status(
+                state,
+                wait_status,
+            )
+
             state["revalidation_required"] = True
 
             state["agent_trace"].append({
                 "step": len(state["agent_trace"]) + 1,
                 "tool": "wait",
                 "reason": reason,
-                "result": wait_status
+                "result": wait_status,
             })
 
             state["history"].append(
@@ -113,11 +162,15 @@ def run_case(case_id: str):
 
             break
 
+        # ====================================================
         # 1. 설계변경 분석
+        # ====================================================
+
         if tool_name == "design_change":
+
             result = analyze_design_change(
                 case_data,
-                case_id
+                case_id,
             )
 
             state["design_change_analyzed"] = True
@@ -125,11 +178,15 @@ def run_case(case_id: str):
 
             execution_result = result.get(
                 "status",
-                "success"
+                "success",
             )
 
+        # ====================================================
         # 2. 검증계획 생성
+        # ====================================================
+
         elif tool_name == "validation_plan":
+
             changes = (
                 state["tool_results"]
                 ["design_change"]
@@ -139,7 +196,7 @@ def run_case(case_id: str):
 
             result = create_validation_plan(
                 changes,
-                case_id
+                case_id,
             )
 
             state["validation_plan_created"] = True
@@ -147,14 +204,18 @@ def run_case(case_id: str):
 
             execution_result = result.get(
                 "status",
-                "success"
+                "success",
             )
 
+        # ====================================================
         # 3. 영향범위 추적
+        # ====================================================
+
         elif tool_name == "impact_trace":
+
             result = trace_impact(
                 case_data,
-                case_id
+                case_id,
             )
 
             state["impact_traced"] = True
@@ -162,11 +223,15 @@ def run_case(case_id: str):
 
             execution_result = result.get(
                 "status",
-                "success"
+                "success",
             )
 
+        # ====================================================
         # 4. 품질검증 및 Risk 판단
+        # ====================================================
+
         elif tool_name == "validate_quality":
+
             impact_result = state["tool_results"]["impact"]
 
             affected_lots = (
@@ -178,7 +243,7 @@ def run_case(case_id: str):
             result = validate_quality(
                 case_data,
                 affected_lots,
-                case_id
+                case_id,
             )
 
             state["quality_validated"] = True
@@ -186,12 +251,12 @@ def run_case(case_id: str):
 
             state["evidence"] = result.get(
                 "evidence",
-                []
+                [],
             )
 
             state["missing_items"] = result.get(
                 "missing_items",
-                []
+                [],
             )
 
             state["decision"] = _get_quality_decision(
@@ -200,13 +265,17 @@ def run_case(case_id: str):
 
             execution_result = state["decision"]
 
+        # ====================================================
         # 5. HOLD / REJECT 후속조치
+        # ====================================================
+
         elif tool_name == "followup":
+
             quality_result = state["tool_results"]["quality"]
 
             result = handle_followup(
                 quality_result,
-                case_id
+                case_id,
             )
 
             state["followup_completed"] = True
@@ -214,7 +283,7 @@ def run_case(case_id: str):
 
             execution_result = result.get(
                 "status",
-                "success"
+                "success",
             )
 
         else:
@@ -222,11 +291,15 @@ def run_case(case_id: str):
                 f"알 수 없는 Tool이 선택되었습니다: {tool_name}"
             )
 
+        # ====================================================
+        # Tool 실행 기록
+        # ====================================================
+
         state["agent_trace"].append({
             "step": len(state["agent_trace"]) + 1,
             "tool": tool_name,
             "reason": reason,
-            "result": execution_result
+            "result": execution_result,
         })
 
         state["history"].append(
@@ -240,10 +313,12 @@ def run_case(case_id: str):
 
 def revalidate_case(state):
     """
-    HOLD 또는 REJECT 상태에서 새로운 보완자료/시정조치 자료가
-    수신된 경우 기존 Case 상태를 이어서 품질검증을 다시 수행한다.
+    HOLD 또는 REJECT 상태에서 새로운 보완자료 또는
+    시정조치 자료가 수신된 경우 기존 Case를 재검증한다.
 
-    설계변경 분석, 검증계획 생성, 영향범위 추적은 다시 수행하지 않는다.
+    최초 단계에서 이미 완료한
+    설계변경 분석, 검증계획 생성, 영향범위 추적은 재사용하고
+    품질검증부터 다시 수행한다.
     """
 
     case_id = state["case_id"]
@@ -255,13 +330,16 @@ def revalidate_case(state):
 
     if state.get("case_status") not in [
         "WAITING_FOR_CORRECTION",
-        "WAITING_FOR_CORRECTIVE_ACTION"
+        "WAITING_FOR_CORRECTIVE_ACTION",
     ]:
         raise ValueError(
             "현재 Case 상태에서는 재검증을 수행할 수 없습니다."
         )
 
-    # 보완자료가 반영된 최신 Case 데이터를 다시 조회
+    # ========================================================
+    # 최신 Case 데이터 다시 조회
+    # ========================================================
+
     case_data = get_case(case_id)
 
     if case_data is None:
@@ -269,7 +347,15 @@ def revalidate_case(state):
             f"Case를 찾을 수 없습니다: {case_id}"
         )
 
-    state["case_status"] = "REVALIDATING"
+    # ========================================================
+    # 재검증 시작 상태 저장
+    # ========================================================
+
+    _save_case_status(
+        state,
+        "REVALIDATING",
+    )
+
     state["revalidation_count"] += 1
 
     state["history"].append(
@@ -277,10 +363,13 @@ def revalidate_case(state):
         f"최신 보완자료를 반영하여 품질검증을 다시 수행합니다."
     )
 
+    # ========================================================
     # 기존 영향범위 결과 재사용
+    # ========================================================
+
     impact_result = state["tool_results"].get(
         "impact",
-        {}
+        {},
     )
 
     affected_lots = (
@@ -289,11 +378,14 @@ def revalidate_case(state):
         .get("affected_lots", [])
     )
 
+    # ========================================================
     # 품질검증 Tool만 재실행
+    # ========================================================
+
     result = validate_quality(
         case_data,
         affected_lots,
-        case_id
+        case_id,
     )
 
     state["quality_validated"] = True
@@ -301,12 +393,12 @@ def revalidate_case(state):
 
     state["evidence"] = result.get(
         "evidence",
-        []
+        [],
     )
 
     state["missing_items"] = result.get(
         "missing_items",
-        []
+        [],
     )
 
     state["decision"] = _get_quality_decision(
@@ -321,7 +413,7 @@ def revalidate_case(state):
             "관련 품질항목을 재검증합니다."
         ),
         "result": state["decision"],
-        "revalidation": state["revalidation_count"]
+        "revalidation": state["revalidation_count"],
     })
 
     state["history"].append(
@@ -329,9 +421,17 @@ def revalidate_case(state):
         f"결과: {state['decision']}"
     )
 
-    # 재검증 결과가 PASS인 경우 Case 종료
+    # ========================================================
+    # 재검증 결과 PASS
+    # ========================================================
+
     if state["decision"] == "PASS":
-        state["case_status"] = "COMPLETED"
+
+        _save_case_status(
+            state,
+            "COMPLETED",
+        )
+
         state["revalidation_required"] = False
         state["followup_completed"] = True
 
@@ -342,7 +442,7 @@ def revalidate_case(state):
                 "재검증 결과가 PASS이므로 "
                 "Case를 종료합니다."
             ),
-            "result": "COMPLETED"
+            "result": "COMPLETED",
         })
 
         state["history"].append(
@@ -351,12 +451,15 @@ def revalidate_case(state):
 
         return state
 
-    # 재검증 결과가 다시 HOLD / REJECT인 경우
+    # ========================================================
+    # 재검증 결과가 다시 HOLD / REJECT
+    # ========================================================
+
     state["followup_completed"] = False
 
     followup_result = handle_followup(
         result,
-        case_id
+        case_id,
     )
 
     state["followup_completed"] = True
@@ -371,18 +474,27 @@ def revalidate_case(state):
         ),
         "result": followup_result.get(
             "status",
-            "success"
-        )
+            "success",
+        ),
     })
 
+    # ========================================================
+    # 다시 대기 상태로 전환
+    # ========================================================
+
     if state["decision"] == "HOLD":
-        state["case_status"] = "WAITING_FOR_CORRECTION"
+        wait_status = "WAITING_FOR_CORRECTION"
 
     elif state["decision"] == "REJECT":
-        state["case_status"] = "WAITING_FOR_CORRECTIVE_ACTION"
+        wait_status = "WAITING_FOR_CORRECTIVE_ACTION"
 
     else:
-        state["case_status"] = "WAITING"
+        wait_status = "WAITING"
+
+    _save_case_status(
+        state,
+        wait_status,
+    )
 
     state["revalidation_required"] = True
 
@@ -393,11 +505,11 @@ def revalidate_case(state):
             "재검증 후 추가 조치가 필요하여 "
             "새로운 자료 수신을 기다립니다."
         ),
-        "result": state["case_status"]
+        "result": wait_status,
     })
 
     state["history"].append(
-        f"재검증 후 대기 | 상태: {state['case_status']}"
+        f"재검증 후 대기 | 상태: {wait_status}"
     )
 
     return state
