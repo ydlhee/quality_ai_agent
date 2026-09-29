@@ -61,7 +61,7 @@ def initialize_mail_case_table():
 
 
 # ============================================================
-# Thread → Case 저장
+# Thread ↔ Case 저장
 # ============================================================
 
 def save_thread_case_mapping(
@@ -73,6 +73,9 @@ def save_thread_case_mapping(
 ):
     """
     Gmail Thread와 Case의 연결관계를 저장한다.
+
+    initial_message_id에는 해당 Case를 최초 생성한
+    Gmail 메시지 ID를 저장한다.
     """
 
     initialize_mail_case_table()
@@ -108,12 +111,23 @@ def save_thread_case_mapping(
 
 
 # ============================================================
-# Thread ID로 Case 찾기
+# Thread ID로 전체 Mail ↔ Case 정보 조회
 # ============================================================
 
-def get_case_id_by_thread(thread_id):
+def get_mail_case_mapping_by_thread(thread_id):
     """
-    Gmail thread_id를 이용해 기존 Case ID를 조회한다.
+    Gmail thread_id를 이용하여 연결된 Case 정보를 조회한다.
+
+    반환 예시:
+
+    {
+        "thread_id": "...",
+        "case_id": "CASE-004",
+        "initial_message_id": "...",
+        "sender": "...",
+        "subject": "...",
+        "created_at": "..."
+    }
 
     연결된 Case가 없으면 None을 반환한다.
     """
@@ -126,7 +140,7 @@ def get_case_id_by_thread(thread_id):
 
         row = conn.execute(
             """
-            SELECT case_id
+            SELECT *
             FROM mail_case_threads
             WHERE thread_id = ?
             """,
@@ -136,19 +150,42 @@ def get_case_id_by_thread(thread_id):
         if row is None:
             return None
 
-        return row["case_id"]
+        return dict(row)
 
     finally:
         conn.close()
 
 
 # ============================================================
-# Case ID로 Gmail Thread 찾기
+# Thread ID로 Case ID 조회
+# ============================================================
+
+def get_case_id_by_thread(thread_id):
+    """
+    Gmail thread_id를 이용하여 기존 Case ID를 조회한다.
+
+    연결된 Case가 없으면 None을 반환한다.
+
+    기존 코드와의 호환성을 위해 유지한다.
+    """
+
+    mapping = get_mail_case_mapping_by_thread(
+        thread_id
+    )
+
+    if mapping is None:
+        return None
+
+    return mapping["case_id"]
+
+
+# ============================================================
+# Case ID로 Gmail Thread 조회
 # ============================================================
 
 def get_thread_by_case_id(case_id):
     """
-    Case ID를 이용해 연결된 Gmail Thread 정보를 조회한다.
+    Case ID를 이용하여 연결된 Gmail Thread 정보를 조회한다.
     """
 
     initialize_mail_case_table()

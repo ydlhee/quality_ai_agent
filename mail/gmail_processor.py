@@ -13,6 +13,7 @@ from parser.quality_certificate_parser import parse_certificate_pdf
 
 from database.mail_case_repository import (
     get_case_id_by_thread,
+    get_thread_by_case_id,
 )
 
 
@@ -22,8 +23,8 @@ from database.mail_case_repository import (
 
 def is_aerochange_mail(message):
     """
-    현재 개발 단계에서는 제목에 AeroChange가 포함된 메일만
-    업무 메일로 처리한다.
+    현재 개발 단계에서는 제목에 AeroChange가 포함된 메일을
+    AeroChange 업무 메일로 처리한다.
     """
 
     subject = message.get("subject", "")
@@ -58,28 +59,71 @@ def extract_case_id(message):
 
 
 # ============================================================
+# Thread 연결 정보 조회
+# ============================================================
+
+def get_thread_mapping(thread_id):
+    """
+    thread_id에 연결된 Case와 최초 message_id를 조회한다.
+
+    기존 repository의 get_case_id_by_thread()와
+    get_thread_by_case_id()를 조합하여 사용한다.
+    """
+
+    if not thread_id:
+        return None
+
+    case_id = get_case_id_by_thread(
+        thread_id
+    )
+
+    if not case_id:
+        return None
+
+    mapping = get_thread_by_case_id(
+        case_id
+    )
+
+    if not mapping:
+        return None
+
+    # 혹시 같은 Case에 다른 Thread가 존재하는 상황을 방지
+    if mapping.get("thread_id") != thread_id:
+        return None
+
+    return mapping
+
+
+# ============================================================
 # 메일 유형 분류
 # ============================================================
 
 def classify_message(message):
     """
-    메일 유형을 분류한다.
+    메일 역할을 분류한다.
 
-    분류 우선순위:
+    분류 규칙
 
-    1. Gmail thread_id가 기존 Case와 연결되어 있는지 확인
-    2. 제목/본문에 CASE-xxx가 있는지 확인
-    3. 둘 다 없으면 신규 Case 후보로 분류
+    1. AeroChange 메일이 아니면 IGNORE
 
-    SUPPLEMENTAL:
-        기존 Case와 연결된 메일
+    2. Gmail Thread가 기존 Case에 연결되어 있고,
+       현재 message_id가 initial_message_id와 같으면
+       최초 메일이므로 INITIAL
 
-    NEW:
-        신규 Case 후보 메일
+    3. Gmail Thread가 기존 Case에 연결되어 있고,
+       현재 message_id가 최초 message_id와 다르면
+       SUPPLEMENTAL
 
-    IGNORE:
-        AeroChange 업무 메일이 아님
+    4. 제목/본문에 기존 Case ID가 있으면
+       SUPPLEMENTAL
+
+    5. 어느 Case와도 연결되지 않은 AeroChange 메일이면
+       NEW
     """
+
+    # --------------------------------------------------------
+    # 1. AeroChange 업무 메일 여부
+    # --------------------------------------------------------
 
     if not is_aerochange_mail(message):
 
@@ -89,34 +133,71 @@ def classify_message(message):
             "reason": "AeroChange 업무 메일이 아닙니다.",
         }
 
+    thread_id = message.get(
+        "thread_id"
+    )
+
+    message_id = message.get(
+        "message_id"
+    )
+
     # --------------------------------------------------------
-    # 1. Gmail Thread ID로 기존 Case 확인
+    # 2. Gmail Thread 연결 정보 확인
     # --------------------------------------------------------
 
-    thread_id = message.get("thread_id")
+    mapping = get_thread_mapping(
+        thread_id
+    )
 
-    if thread_id:
+    if mapping:
 
-        thread_case_id = get_case_id_by_thread(
-            thread_id
+        thread_case_id = mapping.get(
+            "case_id"
         )
 
-        if thread_case_id:
+        initial_message_id = mapping.get(
+            "initial_message_id"
+        )
+
+        # ----------------------------------------------------
+        # 최초 메일
+        # ----------------------------------------------------
+
+        if (
+            initial_message_id
+            and message_id == initial_message_id
+        ):
 
             return {
-                "mail_type": "SUPPLEMENTAL",
+                "mail_type": "INITIAL",
                 "case_id": thread_case_id,
                 "reason": (
-                    "Gmail Thread가 기존 "
-                    f"{thread_case_id}와 연결되어 있습니다."
+                    f"{thread_case_id}를 생성한 "
+                    "최초 요청 메일입니다."
                 ),
             }
 
+        # ----------------------------------------------------
+        # 같은 Thread의 후속 메일
+        # ----------------------------------------------------
+
+        return {
+            "mail_type": "SUPPLEMENTAL",
+            "case_id": thread_case_id,
+            "reason": (
+                f"Gmail Thread가 기존 "
+                f"{thread_case_id}와 연결되어 있으며 "
+                "최초 메일 이후 수신된 후속 자료입니다."
+            ),
+        }
+
     # --------------------------------------------------------
-    # 2. 제목 / 본문의 Case ID 확인
+    # 3. 제목 / 본문에 Case ID가 있는지 확인
     # --------------------------------------------------------
 
-    case_id = extract_case_id(message)
+    case_id = extract_case_id(
+        message
+    )
 
     if case_id:
 
@@ -130,15 +211,15 @@ def classify_message(message):
         }
 
     # --------------------------------------------------------
-    # 3. 신규 Case 후보
+    # 4. 신규 Case 후보
     # --------------------------------------------------------
 
     return {
         "mail_type": "NEW",
         "case_id": None,
         "reason": (
-            "기존 Gmail Thread 및 Case ID가 "
-            "확인되지 않아 신규 Case 후보로 분류했습니다."
+            "기존 Gmail Thread 및 Case ID와 연결되지 않은 "
+            "신규 설계변경 요청 메일입니다."
         ),
     }
 
@@ -149,7 +230,7 @@ def classify_message(message):
 
 def detect_document_type(file_path):
     """
-    프로젝트의 파일명 규칙을 이용해 문서 유형을 판단한다.
+    파일명 규칙을 기준으로 문서 유형을 판별한다.
 
     DWG-* : 도면
     INS-* : 검사성적서
@@ -157,7 +238,9 @@ def detect_document_type(file_path):
     HT-*  : 열처리성적서
     """
 
-    file_name = Path(file_path).name.upper()
+    file_name = Path(
+        file_path
+    ).name.upper()
 
     if file_name.startswith("DWG-"):
         return "DRAWING"
@@ -175,13 +258,13 @@ def detect_document_type(file_path):
 
 
 # ============================================================
-# 첨부 문서 Parser 실행
+# 첨부문서 Parser 실행
 # ============================================================
 
 def parse_attachment(file_path):
     """
     첨부파일의 문서 유형을 판별하고
-    기존 Parser를 실행한다.
+    해당 Parser를 실행한다.
     """
 
     document_type = detect_document_type(
@@ -220,12 +303,21 @@ def parse_attachment(file_path):
             )
 
             if (
-                structured_data.get("missing_fields")
-                or structured_data.get("errors")
+                structured_data.get(
+                    "missing_fields"
+                )
+                or structured_data.get(
+                    "errors"
+                )
             ):
 
-                result["parse_status"] = "WARNING"
-                result["structured_data"] = structured_data
+                result[
+                    "parse_status"
+                ] = "WARNING"
+
+                result[
+                    "structured_data"
+                ] = structured_data
 
                 return result
 
@@ -243,7 +335,10 @@ def parse_attachment(file_path):
         # Heat Treatment Certificate
         # ----------------------------------------------------
 
-        elif document_type == "HEAT_TREATMENT_CERTIFICATE":
+        elif (
+            document_type
+            == "HEAT_TREATMENT_CERTIFICATE"
+        ):
 
             structured_data = parse_certificate_pdf(
                 file_path
@@ -255,19 +350,31 @@ def parse_attachment(file_path):
 
         else:
 
-            result["parse_status"] = "UNSUPPORTED"
+            result[
+                "parse_status"
+            ] = "UNSUPPORTED"
 
             return result
 
-        result["parse_status"] = "SUCCESS"
-        result["structured_data"] = structured_data
+        result[
+            "parse_status"
+        ] = "SUCCESS"
+
+        result[
+            "structured_data"
+        ] = structured_data
 
         return result
 
     except Exception as error:
 
-        result["parse_status"] = "ERROR"
-        result["error"] = str(error)
+        result[
+            "parse_status"
+        ] = "ERROR"
+
+        result[
+            "error"
+        ] = str(error)
 
         return result
 
@@ -280,10 +387,10 @@ def process_message(message):
     """
     메일 하나를 처리한다.
 
-    1. Gmail Thread / Case ID 기반 메일 분류
+    1. 최초/신규/후속 메일 분류
     2. 첨부파일 다운로드
     3. 문서 유형 판별
-    4. 기존 Parser 실행
+    4. Parser 실행
     """
 
     classification = classify_message(
@@ -291,32 +398,58 @@ def process_message(message):
     )
 
     result = {
-        "message_id": message.get("message_id"),
-        "thread_id": message.get("thread_id"),
-        "from": message.get("from"),
-        "subject": message.get("subject"),
-        "body": message.get("body"),
-        "mail_type": classification["mail_type"],
-        "case_id": classification["case_id"],
-        "reason": classification["reason"],
+        "message_id": message.get(
+            "message_id"
+        ),
+        "thread_id": message.get(
+            "thread_id"
+        ),
+        "from": message.get(
+            "from"
+        ),
+        "subject": message.get(
+            "subject"
+        ),
+        "body": message.get(
+            "body"
+        ),
+        "mail_type": classification[
+            "mail_type"
+        ],
+        "case_id": classification[
+            "case_id"
+        ],
+        "reason": classification[
+            "reason"
+        ],
         "saved_attachments": [],
         "parsed_documents": [],
     }
 
-    if classification["mail_type"] == "IGNORE":
+    if (
+        classification[
+            "mail_type"
+        ] == "IGNORE"
+    ):
         return result
 
     # --------------------------------------------------------
     # 첨부파일 다운로드
     # --------------------------------------------------------
 
-    if message.get("attachments"):
+    if message.get(
+        "attachments"
+    ):
 
-        saved_files = download_message_attachments(
-            message
+        saved_files = (
+            download_message_attachments(
+                message
+            )
         )
 
-        result["saved_attachments"] = saved_files
+        result[
+            "saved_attachments"
+        ] = saved_files
 
         # ----------------------------------------------------
         # 모든 첨부문서 자동 Parsing
@@ -324,11 +457,15 @@ def process_message(message):
 
         for file_path in saved_files:
 
-            parsed_document = parse_attachment(
-                file_path
+            parsed_document = (
+                parse_attachment(
+                    file_path
+                )
             )
 
-            result["parsed_documents"].append(
+            result[
+                "parsed_documents"
+            ].append(
                 parsed_document
             )
 
@@ -339,7 +476,9 @@ def process_message(message):
 # 최근 AeroChange 메일 처리
 # ============================================================
 
-def process_recent_messages(max_results=10):
+def process_recent_messages(
+    max_results=10
+):
 
     messages = get_recent_messages(
         max_results=max_results
@@ -361,10 +500,12 @@ def process_recent_messages(max_results=10):
 
 
 # ============================================================
-# 테스트 출력
+# 터미널 테스트 출력
 # ============================================================
 
-def print_processing_results(max_results=10):
+def print_processing_results(
+    max_results=10
+):
 
     results = process_recent_messages(
         max_results=max_results
@@ -393,36 +534,48 @@ def print_processing_results(max_results=10):
     ):
 
         print()
-        print(f"[메일 {index}]")
-
         print(
-            f"Subject: {result['subject']}"
+            f"[메일 {index}]"
         )
 
         print(
-            f"From: {result['from']}"
+            f"Subject: "
+            f"{result['subject']}"
         )
 
         print(
-            f"Thread ID: {result['thread_id']}"
+            f"From: "
+            f"{result['from']}"
         )
 
         print(
-            f"Mail Type: {result['mail_type']}"
+            f"Thread ID: "
+            f"{result['thread_id']}"
         )
 
         print(
-            f"Case ID: {result['case_id']}"
+            f"Mail Type: "
+            f"{result['mail_type']}"
         )
 
         print(
-            f"Reason: {result['reason']}"
+            f"Case ID: "
+            f"{result['case_id']}"
+        )
+
+        print(
+            f"Reason: "
+            f"{result['reason']}"
         )
 
         print()
-        print("[첨부파일]")
+        print(
+            "[첨부파일]"
+        )
 
-        if result["saved_attachments"]:
+        if result[
+            "saved_attachments"
+        ]:
 
             for file_path in result[
                 "saved_attachments"
@@ -437,11 +590,17 @@ def print_processing_results(max_results=10):
             print("- 없음")
 
         print()
-        print("[문서 분석 결과]")
+        print(
+            "[문서 분석 결과]"
+        )
 
-        if not result["parsed_documents"]:
+        if not result[
+            "parsed_documents"
+        ]:
 
-            print("- 분석된 문서 없음")
+            print(
+                "- 분석된 문서 없음"
+            )
 
         for document in result[
             "parsed_documents"
@@ -483,18 +642,23 @@ def print_processing_results(max_results=10):
                 )
 
                 if (
-                    document["parse_status"]
+                    document[
+                        "parse_status"
+                    ]
                     == "WARNING"
                 ):
 
                     print(
-                        "※ 일부 필드 누락 또는 "
-                        "변환 오류가 있습니다."
+                        "일부 필드 누락 또는 "
+                        "본문 오류가 있습니다."
                     )
 
-            elif document[
-                "parse_status"
-            ] == "ERROR":
+            elif (
+                document[
+                    "parse_status"
+                ]
+                == "ERROR"
+            ):
 
                 print(
                     f"Parser 오류: "
