@@ -1,0 +1,94 @@
+{
+  "synthetic_fixture": true,
+  "phases": [
+    {
+      "name": "initial",
+      "case_data": {
+        "case": {
+          "case_id": "VAL-008",
+          "part_no": "A1001",
+          "drawing_revision": "C",
+          "expected_heat_no": "HEAT-100"
+        },
+        "lot": {
+          "lot_no": "LOT008",
+          "part_no": "A1001",
+          "revision": "C",
+          "production_date": "2026-09-20",
+          "effectivity_date": "2026-09-15"
+        },
+        "documents": [
+          {
+            "document_type": "DRAWING",
+            "file_name": "rev_b.json",
+            "document_stage": "INITIAL",
+            "structured_data": {
+              "part_no": "A1001",
+              "revision": "B",
+              "material": "AL7075",
+              "heat_treatment": "T6",
+              "characteristics": [
+                {
+                  "nominal_mm": 20.0,
+                  "tolerance_mm": 0.2
+                }
+              ]
+            }
+          },
+          {
+            "document_type": "DRAWING",
+            "file_name": "rev_c.json",
+            "document_stage": "INITIAL",
+            "structured_data": {
+              "part_no": "A1001",
+              "revision": "C",
+              "material": "AL7075",
+              "heat_treatment": "T6",
+              "characteristics": [
+                {
+                  "nominal_mm": 20.0,
+                  "tolerance_mm": 0.1
+                }
+              ]
+            }
+          },
+          {
+            "document_type": "INSPECTION_REPORT",
+            "file_name": "inspection.json",
+            "document_stage": "INITIAL",
+            "structured_data": {
+              "lot_no": "LOT008",
+              "revision": "C",
+              "measured_mm": 20.05
+            }
+          },
+          {
+            "document_type": "MATERIAL_CERTIFICATE",
+            "file_name": "material.json",
+            "document_stage": "INITIAL",
+            "structured_data": {
+              "lot_no": "LOT008",
+              "material": "AL7075",
+              "heat_no": "HEAT-999"
+            }
+          },
+          {
+            "document_type": "HEAT_TREATMENT_CERTIFICATE",
+            "file_name": "heat.json",
+            "document_stage": "INITIAL",
+            "structured_data": {
+              "lot_no": "LOT008",
+              "heat_treatment": "T6",
+              "heat_no": "HEAT-100"
+            }
+          }
+        ]
+      },
+      "expected": {
+        "decision": "HOLD",
+        "issue_code": "HEAT_NO_MISMATCH",
+        "scope": "IN_EFFECTIVITY_SCOPE"
+      }
+    }
+  ]
+}

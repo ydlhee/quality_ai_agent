@@ -235,15 +235,9 @@ def evaluate_quality(
             )
 
 
-       # ==================================
+    # ==================================
     # 6. Heat No. 추적성
     # ==================================
-
-    expected_heat_no = (
-        requirements.get(
-            "expected_heat_no"
-        )
-    )
 
     material_heat_no = (
         actual.get(
@@ -257,75 +251,55 @@ def evaluate_quality(
         )
     )
 
-
-    # 기준 Heat No.가 있는 경우
+    expected_heat_no = requirements.get("expected_heat_no")
     if expected_heat_no:
+        missing = [name for name, value in (
+            ("소재성적서", material_heat_no),
+            ("열처리성적서", heat_heat_no),
+        ) if not value]
 
-        if (
-            not material_heat_no
-            or not heat_heat_no
-        ):
-            return make_result(
-                "HOLD",
-                "HEAT_NO_MISSING",
-                (
-                    f"Heat No. 확인 자료 부족 "
-                    f"(기준: {expected_heat_no}, "
-                    f"소재: {material_heat_no}, "
-                    f"열처리: {heat_heat_no})"
-                ),
-                expected_heat_no,
-                {
-                    "material_heat_no":
-                        material_heat_no,
-                    "heat_heat_no":
-                        heat_heat_no
-                }
-            )
+        mismatched = [name for name, value in (
+            ("소재성적서", material_heat_no),
+            ("열처리성적서", heat_heat_no),
+        ) if value and value != expected_heat_no]
 
-        if (
-            material_heat_no
-            != expected_heat_no
-            or heat_heat_no
-            != expected_heat_no
-        ):
+        if mismatched:
             return make_result(
                 "HOLD",
                 "HEAT_NO_MISMATCH",
-                (
-                    f"기준 Heat No. 불일치 "
-                    f"(기준: {expected_heat_no}, "
-                    f"소재: {material_heat_no}, "
-                    f"열처리: {heat_heat_no})"
-                ),
+                "기준 Heat No. 불일치: " + ", ".join(mismatched),
                 expected_heat_no,
                 {
-                    "material_heat_no":
-                        material_heat_no,
-                    "heat_heat_no":
-                        heat_heat_no
-                }
+                    "material": material_heat_no,
+                    "heat_treatment": heat_heat_no,
+                },
             )
 
+        if missing:
+            return make_result(
+                "HOLD",
+                "HEAT_NO_MISSING",
+                "Heat No. 누락: " + ", ".join(missing),
+                expected_heat_no,
+                {
+                    "material": material_heat_no,
+                    "heat_treatment": heat_heat_no,
+                },
+            )
 
-    # 기준 Heat No.가 없는 경우 문서끼리 비교
     elif (
         material_heat_no
         and heat_heat_no
-        and material_heat_no
-        != heat_heat_no
+        and material_heat_no != heat_heat_no
     ):
         return make_result(
             "HOLD",
             "HEAT_NO_MISMATCH",
-            (
-                f"Heat No. 불일치 "
-                f"(소재: {material_heat_no}, "
-                f"열처리: {heat_heat_no})"
-            ),
+            "성적서 간 Heat No. 불일치",
             material_heat_no,
-            heat_heat_no
+            heat_heat_no,
         )
+
 
     # ==================================
     # 7. 치수 / 공차

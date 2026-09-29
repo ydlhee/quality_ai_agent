@@ -8,245 +8,138 @@ from tools.quality_verify import validate_quality
 from tools.followup import handle_followup
 
 
-def load_json(file_path):
-    with open(
-        file_path,
-        "r",
-        encoding="utf-8"
-    ) as file:
-        return json.load(file)
+ROOT = Path(__file__).resolve().parent
 
 
-def run_case(case_folder):
-
-    # Validation Case 설정 불러오기
-    case_data = load_json(
-        case_folder / "case.json"
+def run_scenario(path):
+    scenario = json.loads(
+        path.read_text(encoding="utf-8")
     )
 
-    case_id = case_data["case_id"]
-    part_id = case_data["part_id"]
+    for phase in scenario["phases"]:
+        data = phase["case_data"]
+        case_id = data["case"]["case_id"]
 
-    old_revision = case_data["old_revision"]
-    new_revision = case_data["new_revision"]
+        design = analyze_design_change(
+            data,
+            case_id=case_id,
+        )
+        assert not design["missing_items"], "도면 정보 누락"
 
-    effectivity = case_data.get("effectivity")
-
-    expected_material = case_data.get(
-        "expected_material"
-    )
-
-    expected_heat_treatment = case_data.get(
-        "expected_heat_treatment"
-    )
-
-    expected_heat_no = case_data.get(
-        "expected_heat_no"
-    )
-
-    nominal = case_data["nominal"]
-    tolerance = case_data["tolerance"]
-
-    expected_decision = case_data[
-        "expected_decision"
-    ]
-
-
-    # ==============================
-    # 1. 설계변경 분석
-    # ==============================
-
-    design_result = analyze_design_change(
-        str(case_folder / "rev_b.json"),
-        str(case_folder / "rev_c.json"),
-        case_id
-    )
-
-
-    # ==============================
-    # 2. 검증계획 생성
-    # ==============================
-
-    changes = design_result[
-        "result"
-    ]["changes"]
-
-    plan_result = create_validation_plan(
-        changes,
-        case_id,
-        expected_heat_no=expected_heat_no
-    )
-
-
-    # ==============================
-    # 3. 영향범위 추적
-    # ==============================
-
-    impact_result = trace_impact(
-        str(case_folder / "lot.csv"),
-        part_id,
-        old_revision,
-        case_id,
-        effectivity=effectivity
-    )
-
-
-    affected_lots = [
-        lot["lot_id"]
-        for lot in impact_result[
-            "result"
-        ]["affected_lots"]
-    ]
-
-
-    # ==============================
-    # 4. 품질검증
-    # ==============================
-
-    quality_result = validate_quality(
-        str(case_folder / "inspection.csv"),
-        affected_lots,
-        nominal,
-        tolerance,
-        case_id,
-        expected_revision=new_revision,
-        expected_material=expected_material,
-        expected_heat_treatment=(
-            expected_heat_treatment
-        ),
-        expected_heat_no=expected_heat_no
-    )
-
-
-    # ==============================
-    # 5. 후속조치
-    # ==============================
-
-    followup_result = handle_followup(
-        quality_result,
-        case_id
-    )
-
-
-    # ==============================
-    # 실제 판정값 추출
-    # ==============================
-
-    lot_results = quality_result[
-        "result"
-    ]["lot_results"]
-
-    if len(lot_results) > 0:
-
-        actual_decision = lot_results[
-            0
-        ]["decision"]
-
-    else:
-
-        actual_decision = "NO_AFFECTED_LOT"
-
-
-    # ==============================
-    # 결과 출력
-    # ==============================
-
-    print("\n================================")
-    print(case_id)
-    print("================================")
-
-
-    print("설계변경:")
-    print(
-        design_result[
-            "result"
-        ]["changes"]
-    )
-
-
-    print("\n검증계획:")
-    print(
-        plan_result[
-            "result"
-        ]["validation_tasks"]
-    )
-
-
-    print("\n영향 Lot:")
-    print(
-        impact_result[
-            "result"
-        ]["affected_lots"]
-    )
-
-
-    print("\n품질판정:")
-    print(
-        quality_result[
-            "result"
-        ]["lot_results"]
-    )
-
-
-    print("\n후속조치:")
-    print(
-        followup_result[
-            "result"
-        ]["actions"]
-    )
-
-
-    print(
-        "\n예상 판정 :",
-        expected_decision
-    )
-
-    print(
-        "실제 판정 :",
-        actual_decision
-    )
-
-
-    if actual_decision == expected_decision:
-
-        print(
-            "TEST RESULT : PASS"
+        plan = create_validation_plan(
+            design["result"]["changes"],
+            case_id,
         )
 
-    else:
+        impact = trace_impact(
+            data,
+            case_id=case_id,
+        )
+        assert not impact["missing_items"], "Lot 날짜 정보 누락"
 
-        print(
-            "TEST RESULT : FAIL"
+        quality = validate_quality(
+            data,
+            affected_lots=impact["result"]["affected_lots"],
+            case_id=case_id,
+            required_documents=plan["result"]["required_documents"],
         )
 
+        followup = handle_followup(
+            quality,
+            case_id,
+        )
 
-# ==============================
-# Validation Case 경로
-# ==============================
+        expected = phase["expected"]
+        scope = impact["result"]["impact_status"]
+        rows = quality["result"]["lot_results"]
+        actions = followup["result"]["actions"]
 
-base_path = Path(
-    "data/validation_cases"
-)
+        assert scope == expected["scope"], f"영향범위: {scope}"
+
+        if expected["decision"] == "EXCLUDED":
+            assert not rows and not actions, (
+                "적용 전 Lot에 판정/조치 발생"
+            )
+            print(
+                f"  {phase['name']}: 적용 전 Lot 정상 제외"
+            )
+            continue
+
+        assert len(rows) == 1, f"판정 개수: {len(rows)}"
+
+        row = rows[0]
+        actual = (
+            row["decision"],
+            row["issue_code"],
+        )
+        target = (
+            expected["decision"],
+            expected["issue_code"],
+        )
+
+        print(
+            f"  {phase['name']}: 실제 {actual}, 예상 {target}"
+        )
+
+        assert actual == target, (
+            f"판정/원인 불일치: {actual} != {target}"
+        )
+
+        assert row["lot_id"] == data["lot"]["lot_no"], (
+            "판정 Lot 불일치"
+        )
+
+        assert len(actions) == 1, "후속조치 개수 오류"
+
+        expected_action = {
+            "PASS": "NONE",
+            "HOLD": "CORRECTION_REQUEST",
+            "REJECT": "REJECT_LOT",
+        }[row["decision"]]
+
+        assert actions[0]["action"] == expected_action, (
+            "후속조치 불일치"
+        )
+
+        assert bool(quality["evidence"]), "판정 근거 없음"
 
 
-# ==============================
-# VAL-001 ~ VAL-009 실행
-# ==============================
+def main():
+    success = 0
 
-for case_name in [
+    for index in range(1, 16):
+        name = f"VAL-{index:03d}"
+        path = (
+            ROOT
+            / "data"
+            / "validation_cases_v2"
+            / name
+            / "scenario.json"
+        )
 
-    "VAL-001",
-    "VAL-002",
-    "VAL-003",
-    "VAL-004",
-    "VAL-005",
-    "VAL-006",
-    "VAL-007",
-    "VAL-008",
-    "VAL-009"
+        print(f"\\n===== {name} =====")
 
-]:
+        try:
+            run_scenario(path)
+            success += 1
+            print("TEST RESULT: PASS")
 
-    run_case(
-        base_path / case_name
+        except Exception as exc:
+            print(
+                f"TEST RESULT: FAIL / "
+                f"{type(exc).__name__}: {exc}"
+            )
+
+    print(
+        f"\\n총 15개: PASS {success}, FAIL {15 - success}"
     )
+    print(
+        "가상 구조화 자료 기반 Tool 테스트입니다. "
+        "Gmail/DB 통합 검증은 별도입니다."
+    )
+
+    return 0 if success == 15 else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -339,6 +339,7 @@ def validate_quality(
     # Rule 기반 품질판정
     # ==================================
 
+    requirements = {**requirements, "expected_heat_no": case_data.get("case", {}).get("expected_heat_no")}
     rule_result = (
         evaluate_quality(
             requirements,
