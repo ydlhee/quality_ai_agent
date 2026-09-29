@@ -1,0 +1,11 @@
+{
+  "case_id": "VAL-007",
+  "part_id": "A1001",
+  "old_revision": "B",
+  "new_revision": "C",
+  "nominal": 20.0,
+  "tolerance": 0.1,
+  "expected_decision": "HOLD",
+  "source_case_id": "CASE-007",
+  "dataset_type": "VALIDATION"
+}

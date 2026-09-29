@@ -1,0 +1,16 @@
+{
+  "sender": "quality@sup-002.example.com",
+  "subject": "P-001 / LOT-005 품질자료 제출",
+  "body": "PO-002 관련 LOT-005 품질자료를 전달드립니다.",
+  "supplier_id": "SUP-002",
+  "part_no": "P-001",
+  "po_no": "PO-002",
+  "lot_no": "LOT-005",
+  "drawing_revision": "C",
+  "attachment_files": [
+    "DWG-001_RevB.pdf",
+    "DWG-001_RevC.pdf",
+    "MAT-005.pdf",
+    "HT-005.pdf"
+  ]
+}

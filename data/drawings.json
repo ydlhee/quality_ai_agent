@@ -1,0 +1,30 @@
+[
+  {
+    "drawing_no": "DWG-001",
+    "part_no": "P-001",
+    "revision": "B",
+    "effective_from": "2026-01-01",
+    "characteristics": [
+      {
+        "characteristic_id": "DIM-001",
+        "name": "Hole diameter",
+        "nominal_mm": 10.0,
+        "tolerance_mm": 0.1
+      }
+    ]
+  },
+  {
+    "drawing_no": "DWG-001",
+    "part_no": "P-001",
+    "revision": "C",
+    "effective_from": "2026-09-20",
+    "characteristics": [
+      {
+        "characteristic_id": "DIM-001",
+        "name": "Hole diameter",
+        "nominal_mm": 10.0,
+        "tolerance_mm": 0.05
+      }
+    ]
+  }
+]

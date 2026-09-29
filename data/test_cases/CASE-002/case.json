@@ -1,9 +1,10 @@
 {
   "case_id": "CASE-002",
-  "part_id": "A1001",
-  "old_revision": "B",
-  "new_revision": "C",
-  "nominal": 20.0,
-  "tolerance": 0.1,
-  "expected_decision": "HOLD"
+  "part_no": "P-001",
+  "po_no": "PO-002",
+  "lot_no": "LOT-005",
+  "supplier_id": "SUP-002",
+  "supplier_name": "진주에어로",
+  "drawing_revision": "C",
+  "case_status": "OPEN"
 }

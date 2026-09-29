@@ -5,3 +5,6 @@
 __pycache__/
 *.pyc
 .streamlit/secrets.toml
+database/sample_lots.db
+__pycache__/
+data/parsed/
