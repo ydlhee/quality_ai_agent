@@ -281,6 +281,7 @@ def validate_quality(
                 **item,
                 "lot_id": lot_no,
                 "requirement": lot_result["requirement"],
+                "actual_value": lot_result["actual_value"],
                 "result": lot_result["decision"]
             }
             for item in requirement_evidence
@@ -396,6 +397,7 @@ def validate_quality(
             **item,
             "lot_id": lot_no,
             "requirement": lot_result["requirement"],
+            "actual_value": lot_result["actual_value"],
             "result": lot_result["decision"]
         }
         for item in evidence

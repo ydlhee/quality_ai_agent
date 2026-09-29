@@ -78,7 +78,7 @@ def evaluate_quality(
         != required_revision
     ):
         return make_result(
-            "HOLD",
+            "REJECT",
             "REVISION_MISMATCH",
             (
                 f"Lot Revision 불일치 "
@@ -107,7 +107,7 @@ def evaluate_quality(
         != lot_no
     ):
         return make_result(
-            "HOLD",
+            "REJECT",
             "LOT_ID_MISMATCH",
             (
                 f"Lot 번호 불일치 "
@@ -136,7 +136,7 @@ def evaluate_quality(
         != required_revision
     ):
         return make_result(
-            "HOLD",
+            "REJECT",
             "REVISION_MISMATCH",
             (
                 f"검사성적서 Revision 불일치 "
