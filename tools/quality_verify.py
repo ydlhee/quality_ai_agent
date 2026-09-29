@@ -174,6 +174,22 @@ def validate_quality(
                 []
             )
         )
+    expected_heat_no = (
+        case_data.get("expected_heat_no")
+        or case_data.get(
+            "case",
+            {}
+        ).get("expected_heat_no")
+    )
+
+    if expected_heat_no:
+        requirements = dict(
+            requirements or {}
+        )
+
+        requirements[
+            "expected_heat_no"
+        ] = expected_heat_no
 
 
     # ==================================

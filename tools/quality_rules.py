@@ -136,7 +136,7 @@ def evaluate_quality(
         != required_revision
     ):
         return make_result(
-            "REJECT",
+            "HOLD",
             "REVISION_MISMATCH",
             (
                 f"검사성적서 Revision 불일치 "
@@ -235,9 +235,15 @@ def evaluate_quality(
             )
 
 
-    # ==================================
+       # ==================================
     # 6. Heat No. 추적성
     # ==================================
+
+    expected_heat_no = (
+        requirements.get(
+            "expected_heat_no"
+        )
+    )
 
     material_heat_no = (
         actual.get(
@@ -251,7 +257,59 @@ def evaluate_quality(
         )
     )
 
-    if (
+
+    # 기준 Heat No.가 있는 경우
+    if expected_heat_no:
+
+        if (
+            not material_heat_no
+            or not heat_heat_no
+        ):
+            return make_result(
+                "HOLD",
+                "HEAT_NO_MISSING",
+                (
+                    f"Heat No. 확인 자료 부족 "
+                    f"(기준: {expected_heat_no}, "
+                    f"소재: {material_heat_no}, "
+                    f"열처리: {heat_heat_no})"
+                ),
+                expected_heat_no,
+                {
+                    "material_heat_no":
+                        material_heat_no,
+                    "heat_heat_no":
+                        heat_heat_no
+                }
+            )
+
+        if (
+            material_heat_no
+            != expected_heat_no
+            or heat_heat_no
+            != expected_heat_no
+        ):
+            return make_result(
+                "HOLD",
+                "HEAT_NO_MISMATCH",
+                (
+                    f"기준 Heat No. 불일치 "
+                    f"(기준: {expected_heat_no}, "
+                    f"소재: {material_heat_no}, "
+                    f"열처리: {heat_heat_no})"
+                ),
+                expected_heat_no,
+                {
+                    "material_heat_no":
+                        material_heat_no,
+                    "heat_heat_no":
+                        heat_heat_no
+                }
+            )
+
+
+    # 기준 Heat No.가 없는 경우 문서끼리 비교
+    elif (
         material_heat_no
         and heat_heat_no
         and material_heat_no
@@ -268,7 +326,6 @@ def evaluate_quality(
             material_heat_no,
             heat_heat_no
         )
-
 
     # ==================================
     # 7. 치수 / 공차
