@@ -8,3 +8,7 @@ __pycache__/
 database/sample_lots.db
 __pycache__/
 data/parsed/
+credentials.json
+token.json
+
+data/mail_attachments/
