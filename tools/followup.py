@@ -92,22 +92,38 @@ REJECT_RULES = {
 def build_hold_request(
     lot_id,
     issue_code,
-    reason
+    reason,
+    requirement=None
 ):
 
-    rule = HOLD_REQUEST_RULES.get(
-        issue_code,
-        {
-            "request_type": "additional_document",
-            "required_items": [
-                "품질검증에 필요한 보완자료"
-            ]
-        }
-    )
+    if (
+        issue_code == "REQUIRED_DOCUMENT_MISSING"
+        and requirement
+    ):
+        if isinstance(requirement, list):
+            required_items = requirement
+        else:
+            required_items = [requirement]
 
-    required_items = rule[
-        "required_items"
-    ]
+        rule = {
+            "request_type": "required_document",
+            "required_items": required_items
+        }
+
+    else:
+        rule = HOLD_REQUEST_RULES.get(
+            issue_code,
+            {
+                "request_type": "additional_document",
+                "required_items": [
+                    "품질검증에 필요한 보완자료"
+                   ]
+                }
+        )
+
+        required_items = rule[
+            "required_items"
+        ]
 
     draft_message = (
         f"{lot_id} 품질검증 과정에서 "
@@ -233,7 +249,8 @@ def build_hold_action(item):
     request = build_hold_request(
         item["lot_id"],
         item["issue_code"],
-        item["reason"]
+        item["reason"],
+        item.get("requirement")
     )
 
     return {
