@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 
 from agent.runner import run_case
 from database.live_case_service import create_live_case
+from database.supplemental_repository import register_supplemental
 from mail.gmail_processor import process_recent_messages
 from ui.components import (
     show_case_status,
@@ -1060,6 +1061,111 @@ else:
                         f"{case_id}에 연결된 "
                         "보완/후속 자료입니다."
                     )
+
+                    supplemental_documents = [
+                        document
+                        for document in parsed_documents
+                        if document.get("parse_status") in {"SUCCESS", "WARNING"}
+                        and document.get("document_type") in {
+                            "INSPECTION_REPORT",
+                            "MATERIAL_CERTIFICATE",
+                            "HEAT_TREATMENT_CERTIFICATE",
+                        }
+                        and isinstance(document.get("structured_data"), dict)
+                    ]
+
+                    if supplemental_documents:
+                        supplemental_button = st.button(
+                            "보완자료 등록 및 재검증",
+                            key=f"supplemental_{index}_{mail.get('message_id') or thread_id}",
+                            type="primary",
+                            use_container_width=True,
+                        )
+
+                        if supplemental_button:
+                            try:
+                                message_id = mail.get("message_id") or mail.get("id")
+
+                                if not message_id:
+                                    raise ValueError(
+                                        "Gmail message_id를 확인할 수 없습니다."
+                                    )
+
+                                attachments = [
+                                    {
+                                        "file_name": document.get("file_name"),
+                                        "file_path": document.get("file_path"),
+                                        "document_type": document.get("document_type"),
+                                        "parsed_data": document.get("structured_data"),
+                                    }
+                                    for document in supplemental_documents
+                                ]
+
+                                with st.spinner(
+                                    f"{case_id}에 보완자료를 등록하고 있습니다..."
+                                ):
+                                    register_result = register_supplemental(
+                                        case_id=case_id,
+                                        message_id=message_id,
+                                        attachments=attachments,
+                                    )
+
+                                added_count = register_result.get("added_count", 0)
+                                skipped_count = register_result.get("skipped_count", 0)
+
+                                if added_count:
+                                    st.success(
+                                        f"보완자료 {added_count}건을 "
+                                        f"{case_id}에 등록했습니다."
+                                    )
+
+                                if skipped_count:
+                                    st.info(
+                                        f"이미 등록된 보완자료 {skipped_count}건은 "
+                                        "중복 저장하지 않았습니다."
+                                    )
+
+                                with st.spinner(
+                                    f"{case_id}를 재검증하고 있습니다..."
+                                ):
+                                    state = run_case(case_id)
+
+                                st.session_state["last_agent_state"] = state
+                                st.session_state["last_case_id"] = case_id
+
+                                decision = state.get("decision", "-")
+                                case_status = state.get("case_status", "-")
+
+                                if decision == "PASS":
+                                    st.success(
+                                        f"{case_id} 재검증 결과: PASS"
+                                    )
+                                elif decision == "HOLD":
+                                    st.warning(
+                                        f"{case_id} 재검증 결과: HOLD"
+                                    )
+                                elif decision == "REJECT":
+                                    st.error(
+                                        f"{case_id} 재검증 결과: REJECT"
+                                    )
+                                else:
+                                    st.info(
+                                        f"{case_id} 재검증 결과: {decision}"
+                                    )
+
+                                st.write(f"**Case 상태:** {case_status}")
+                                st.divider()
+                                show_agent_result(state, case_id)
+
+                            except Exception as error:
+                                st.error(
+                                    "보완자료 등록 또는 재검증 중 "
+                                    f"오류가 발생했습니다: {error}"
+                                )
+                    else:
+                        st.warning(
+                            "등록 가능한 보완 품질문서가 없습니다."
+                        )
 
 
 st.divider()
