@@ -26,6 +26,7 @@ def show_case_status(state):
 
     with col5:
         st.write("⑤ 후속조치")
+
         if state["followup_completed"]:
             st.write("완료")
         elif state["decision"] == "PASS":
@@ -91,11 +92,31 @@ def show_result(state):
     if evidence:
         evidence_rows = []
 
+        document_type_labels = {
+            "INSPECTION_REPORT": "검사성적서",
+            "MATERIAL_CERTIFICATE": "소재성적서",
+            "HEAT_TREATMENT_CERTIFICATE": "열처리성적서",
+        }
+
         for item in evidence:
+            role = item.get("role")
+            document_type = item.get("document_type")
+
+            if role == "OLD_DRAWING":
+                evidence_type = "변경 전 도면"
+            elif role == "NEW_DRAWING":
+                evidence_type = "변경 후 도면"
+            else:
+                evidence_type = document_type_labels.get(
+                    document_type,
+                    document_type or "-"
+                )
+
             evidence_rows.append({
+                "근거문서": item.get("file_name", "-"),
+                "문서유형": evidence_type,
                 "Lot": item.get("lot_id", "-"),
-                "요구조건": item.get("requirement", "-"),
-                "검증 결과": item.get("result", "-")
+                "검증결과": item.get("result", "-")
             })
 
         st.dataframe(
@@ -103,6 +124,7 @@ def show_result(state):
             use_container_width=True,
             hide_index=True
         )
+
     else:
         st.write("등록된 검증 근거가 없습니다.")
 
@@ -119,6 +141,7 @@ def show_followup(state):
             st.success("PASS Case로 추가 후속조치가 필요하지 않습니다.")
         else:
             st.write("후속조치가 실행되지 않았습니다.")
+
         return
 
     actions = followup.get("result", {}).get("actions", [])
