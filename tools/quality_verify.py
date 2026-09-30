@@ -174,6 +174,22 @@ def validate_quality(
                 []
             )
         )
+    expected_heat_no = (
+        case_data.get("expected_heat_no")
+        or case_data.get(
+            "case",
+            {}
+        ).get("expected_heat_no")
+    )
+
+    if expected_heat_no:
+        requirements = dict(
+            requirements or {}
+        )
+
+        requirements[
+            "expected_heat_no"
+        ] = expected_heat_no
 
 
     # ==================================
@@ -281,6 +297,7 @@ def validate_quality(
                 **item,
                 "lot_id": lot_no,
                 "requirement": lot_result["requirement"],
+                "actual_value": lot_result["actual_value"],
                 "result": lot_result["decision"]
             }
             for item in requirement_evidence
@@ -322,6 +339,7 @@ def validate_quality(
     # Rule 기반 품질판정
     # ==================================
 
+    requirements = {**requirements, "expected_heat_no": case_data.get("case", {}).get("expected_heat_no")}
     rule_result = (
         evaluate_quality(
             requirements,
@@ -396,6 +414,7 @@ def validate_quality(
             **item,
             "lot_id": lot_no,
             "requirement": lot_result["requirement"],
+            "actual_value": lot_result["actual_value"],
             "result": lot_result["decision"]
         }
         for item in evidence
