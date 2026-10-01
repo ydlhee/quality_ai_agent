@@ -1,0 +1,84 @@
+{
+  "case_id": "QA-009",
+  "title": "검사성적서가 다른 Lot을 가리킴",
+  "synthetic_fixture": true,
+  "oracle_status": "PENDING_TEAM_DECISION",
+  "expected": {
+    "decision": null,
+    "issue_code": "LOT_ID_MISMATCH",
+    "scope": "IN_EFFECTIVITY_SCOPE"
+  },
+  "design_requirements": {
+    "new_revision": "C",
+    "effectivity": "2026-09-15",
+    "nominal_mm": "20.0",
+    "tolerance_mm": "0.1",
+    "lower_mm": "19.9",
+    "upper_mm": "20.1",
+    "material": "AL7075",
+    "heat_treatment": "T6"
+  },
+  "actual_data": {
+    "lot": {
+      "lot_no": "LOT-QA-009",
+      "part_no": "A1001",
+      "revision": "C",
+      "production_date": "2026-09-20",
+      "effectivity_date": "2026-09-15"
+    },
+    "inspection": {
+      "lot_no": "LOT-OTHER-999",
+      "revision": "C",
+      "measured_mm": 20.05,
+      "part_no": "A1001"
+    },
+    "material_certificate": {
+      "lot_no": "LOT-QA-009",
+      "material": "AL7075",
+      "heat_no": "HEAT-100",
+      "part_no": "A1001"
+    },
+    "heat_certificate": {
+      "lot_no": "LOT-QA-009",
+      "heat_treatment": "T6",
+      "heat_no": "HEAT-100",
+      "part_no": "A1001"
+    },
+    "missing_document_types": []
+  },
+  "independent_checks": {
+    "in_effectivity_scope": true,
+    "within_new_tolerance": true,
+    "inspection_lot_matches": false
+  },
+  "reason": "Lot 불일치 탐지는 필수입니다. HOLD/REJECT 선택은 팀 합의 후 확정하며, PASS는 허용하지 않습니다.",
+  "evidence": [
+    {
+      "document_type": "DRAWING",
+      "file_name": "QA-009_rev_b.json",
+      "json_pointer": "/phases/0/case_data/documents/0/structured_data"
+    },
+    {
+      "document_type": "DRAWING",
+      "file_name": "QA-009_rev_c.json",
+      "json_pointer": "/phases/0/case_data/documents/1/structured_data"
+    },
+    {
+      "document_type": "INSPECTION_REPORT",
+      "file_name": "QA-009_inspection.json",
+      "json_pointer": "/phases/0/case_data/documents/2/structured_data"
+    },
+    {
+      "document_type": "MATERIAL_CERTIFICATE",
+      "file_name": "QA-009_material.json",
+      "json_pointer": "/phases/0/case_data/documents/3/structured_data"
+    },
+    {
+      "document_type": "HEAT_TREATMENT_CERTIFICATE",
+      "file_name": "QA-009_heat.json",
+      "json_pointer": "/phases/0/case_data/documents/4/structured_data"
+    }
+  ],
+  "actual_result": null,
+  "execution_status": "NOT_RUN"
+}

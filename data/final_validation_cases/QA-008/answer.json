@@ -1,0 +1,76 @@
+{
+  "case_id": "QA-008",
+  "title": "재질 변경 후 필수 소재성적서 누락",
+  "synthetic_fixture": true,
+  "oracle_status": "DEFINED",
+  "expected": {
+    "decision": "HOLD",
+    "issue_code": "REQUIRED_DOCUMENT_MISSING",
+    "scope": "IN_EFFECTIVITY_SCOPE"
+  },
+  "design_requirements": {
+    "new_revision": "C",
+    "effectivity": "2026-09-15",
+    "nominal_mm": "20.0",
+    "tolerance_mm": "0.1",
+    "lower_mm": "19.9",
+    "upper_mm": "20.1",
+    "material": "AL2024",
+    "heat_treatment": "T6"
+  },
+  "actual_data": {
+    "lot": {
+      "lot_no": "LOT-QA-008",
+      "part_no": "A1001",
+      "revision": "C",
+      "production_date": "2026-09-20",
+      "effectivity_date": "2026-09-15"
+    },
+    "inspection": {
+      "lot_no": "LOT-QA-008",
+      "revision": "C",
+      "measured_mm": 20.05,
+      "part_no": "A1001"
+    },
+    "material_certificate": null,
+    "heat_certificate": {
+      "lot_no": "LOT-QA-008",
+      "heat_treatment": "T6",
+      "heat_no": "HEAT-100",
+      "part_no": "A1001"
+    },
+    "missing_document_types": [
+      "MATERIAL_CERTIFICATE"
+    ]
+  },
+  "independent_checks": {
+    "in_effectivity_scope": true,
+    "within_new_tolerance": true,
+    "inspection_lot_matches": true
+  },
+  "reason": "재질 변경으로 소재성적서가 필수입니다. 해당 문서 자체를 제출 목록에서 제외했습니다.",
+  "evidence": [
+    {
+      "document_type": "DRAWING",
+      "file_name": "QA-008_rev_b.json",
+      "json_pointer": "/phases/0/case_data/documents/0/structured_data"
+    },
+    {
+      "document_type": "DRAWING",
+      "file_name": "QA-008_rev_c.json",
+      "json_pointer": "/phases/0/case_data/documents/1/structured_data"
+    },
+    {
+      "document_type": "INSPECTION_REPORT",
+      "file_name": "QA-008_inspection.json",
+      "json_pointer": "/phases/0/case_data/documents/2/structured_data"
+    },
+    {
+      "document_type": "HEAT_TREATMENT_CERTIFICATE",
+      "file_name": "QA-008_heat.json",
+      "json_pointer": "/phases/0/case_data/documents/3/structured_data"
+    }
+  ],
+  "actual_result": null,
+  "execution_status": "NOT_RUN"
+}
