@@ -28,6 +28,49 @@ st.set_page_config(
 
 
 # ============================================================
+# 기업용 품질관리 대시보드 스타일 (UI 전용)
+# ============================================================
+st.markdown("""
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+:root { --navy:#152a46; --ink:#20334c; --muted:#64748b; --line:#e1e8f0; }
+html, body, [class*="css"], [data-testid="stApp"] { font-family:'Inter','Malgun Gothic',sans-serif; }
+[data-testid="stAppViewContainer"] { background:#f5f7fb; }
+.block-container { max-width:1350px; padding-top:2.2rem; padding-bottom:4rem; }
+[data-testid="stHeader"] { background:transparent; }
+h1,h2,h3 { color:var(--navy); letter-spacing:-.025em; }
+h2 { font-size:1.35rem!important; }
+h3 { font-size:1.1rem!important; }
+[data-testid="stVerticalBlockBorderWrapper"] > div { border-color:var(--line)!important; }
+[data-testid="stMetric"] { background:white; padding:19px 22px; border:1px solid var(--line); border-radius:12px; min-height:116px; box-shadow:0 2px 10px rgba(21,42,70,.035); }
+[data-testid="stMetricLabel"] { color:var(--muted); font-size:.86rem; }
+[data-testid="stMetricValue"] { color:var(--navy); font-weight:750; }
+[data-testid="stExpander"] { border:1px solid var(--line)!important; border-radius:10px!important; background:white; overflow:hidden; }
+[data-testid="stDataFrame"] { border:1px solid var(--line); border-radius:8px; overflow:hidden; }
+[data-testid="stAlert"] { border-radius:9px; }
+.stButton > button[kind="primary"] { background:#1c4169!important; border-color:#1c4169!important; color:white!important; border-radius:8px; font-weight:650; }
+.stButton > button { border-radius:8px; min-height:39px; }
+hr { border-color:var(--line)!important; margin:1.5rem 0!important; }
+.aero-header { background:linear-gradient(115deg,#142b49,#224d73); border-radius:15px; padding:27px 32px; margin-bottom:25px; color:white; box-shadow:0 6px 22px rgba(21,42,70,.12); }
+.aero-eyebrow { color:#a9c6e3; font-size:.72rem; font-weight:700; letter-spacing:.18em; margin-bottom:9px; }
+.aero-brand { color:white; font-size:1.9rem; font-weight:800; letter-spacing:-.04em; margin:0; }
+.aero-sub { color:#d7e6f3; font-size:.91rem; margin-top:6px; }
+.aero-system { display:inline-block; margin-top:16px; padding:5px 10px; border:1px solid #547b9b; border-radius:30px; font-size:.71rem; color:#d7ebf5; letter-spacing:.07em; }
+.aero-section { font-size:.74rem; font-weight:800; letter-spacing:.13em; color:#6381a1; margin:8px 0 5px; }
+.aero-section-title { color:#152a46; font-size:1.37rem; font-weight:750; margin-bottom:7px; }
+.aero-section-desc { color:#64748b; font-size:.86rem; margin-bottom:15px; }
+.aero-case { display:flex; justify-content:space-between; align-items:center; gap:15px; flex-wrap:wrap; margin:10px 0 18px; padding:17px 22px; background:white; border:1px solid var(--line); border-left:5px solid #275782; border-radius:10px; }
+.aero-case-name { color:#152a46; font-size:1.08rem; font-weight:750; }
+.aero-case-note { color:#64748b; font-size:.76rem; margin-top:3px; }
+.aero-pill { border-radius:30px; padding:6px 14px; font-size:.8rem; font-weight:750; }
+.aero-pill.pass { background:#e7f5ed; color:#207248; }
+.aero-pill.hold { background:#fff2d7; color:#926015; }
+.aero-pill.reject { background:#fce7e7; color:#ac3434; }
+.aero-pill.other { background:#e8eef5; color:#38516a; }
+</style>
+""", unsafe_allow_html=True)
+
+# ============================================================
 # 공통 함수
 # ============================================================
 
@@ -594,8 +637,14 @@ def show_document_analysis(parsed_documents):
 # ============================================================
 
 def show_agent_result(state, case_id):
-    st.subheader(
-        f"Case Overview · {case_id}"
+    decision_label = str(state.get("decision") or "PROCESSING").upper()
+    decision_style = decision_label.lower() if decision_label in {"PASS", "HOLD", "REJECT"} else "other"
+    st.markdown(
+        f'<div class="aero-section">QUALITY CONTROL / CASE DETAIL</div>'
+        f'<div class="aero-case"><div><div class="aero-case-name">{case_id}</div>'
+        f'<div class="aero-case-note">설계변경 영향분석 및 품질검증 결과</div></div>'
+        f'<span class="aero-pill {decision_style}">{decision_label}</span></div>',
+        unsafe_allow_html=True,
     )
 
     col1, col2, col3, col4 = st.columns(4)
@@ -668,20 +717,25 @@ def show_agent_result(state, case_id):
 # Header
 # ============================================================
 
-st.title("AeroChange Trace AI")
-
-st.caption(
-    "항공기 설계변경 전주기 품질검증 AI Agent"
-)
-
-st.divider()
+st.markdown("""
+<div class="aero-header">
+  <div class="aero-eyebrow">AEROSPACE · QUALITY INTELLIGENCE</div>
+  <div class="aero-brand">AeroChange Trace AI</div>
+  <div class="aero-sub">항공기 설계변경 영향추적 · 협력업체 품질검증 AI Agent</div>
+  <div class="aero-system">● QUALITY OPERATIONS WORKSPACE</div>
+</div>
+""", unsafe_allow_html=True)
 
 
 # ============================================================
 # Gmail 수신 메일
 # ============================================================
 
-st.subheader("수신 메일")
+st.markdown("""
+<div class="aero-section">01 / WORK QUEUE</div>
+<div class="aero-section-title">수신 메일 · Case Inbox</div>
+<div class="aero-section-desc">설계변경 요청과 보완자료를 확인하고 연결된 Case의 검증을 진행합니다.</div>
+""", unsafe_allow_html=True)
 
 mail_col1, mail_col2 = st.columns(
     [4, 1]
@@ -1175,9 +1229,10 @@ st.divider()
 # 개발 / 테스트용 Case 직접 실행
 # ============================================================
 
-st.subheader(
-    "Case 직접 검증"
-)
+st.markdown("""
+<div class="aero-section">02 / DEVELOPMENT TOOLS</div>
+<div class="aero-section-title">Case 직접 검증</div>
+""", unsafe_allow_html=True)
 
 st.caption(
     "개발 및 테스트용 기능입니다. "
