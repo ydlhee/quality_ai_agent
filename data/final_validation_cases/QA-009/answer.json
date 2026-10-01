@@ -4,7 +4,7 @@
   "synthetic_fixture": true,
   "oracle_status": "PENDING_TEAM_DECISION",
   "expected": {
-    "decision": null,
+    "decision": "REJECT",
     "issue_code": "LOT_ID_MISMATCH",
     "scope": "IN_EFFECTIVITY_SCOPE"
   },
