@@ -1,0 +1,884 @@
+[
+  {
+    "name": "대상 Lot",
+    "passed": true,
+    "actual": "LOT-008",
+    "expected": "LOT-008"
+  },
+  {
+    "name": "Case와 Lot의 부품번호",
+    "passed": true,
+    "actual": "P-002",
+    "expected": "P-002"
+  },
+  {
+    "name": "Case와 Lot의 발주번호",
+    "passed": true,
+    "actual": "PO-003",
+    "expected": "PO-003"
+  },
+  {
+    "name": "DWG-002_RevB.pdf: PDF 재분석 결과와 DB 일치",
+    "passed": true,
+    "actual": {
+      "drawing_no": "DWG-002",
+      "part_no": "P-002",
+      "revision": "B",
+      "effective_from": "2026-01-01",
+      "material": "Ti-6Al-4V",
+      "heat_treatment": "Annealed",
+      "characteristics": [
+        {
+          "characteristic_id": "DIM-001",
+          "name": "Hole diameter",
+          "nominal_mm": 20.0,
+          "tolerance_mm": 0.2
+        }
+      ],
+      "source_file": "DWG-002_RevB.pdf",
+      "evidence": {
+        "drawing_no": {
+          "page": 1,
+          "text": "Drawing No: DWG-002"
+        },
+        "part_no": {
+          "page": 1,
+          "text": "Part No: P-002"
+        },
+        "revision": {
+          "page": 1,
+          "text": "Revision: B"
+        },
+        "effective_from": {
+          "page": 1,
+          "text": "Effective From: 2026-01-01"
+        },
+        "material": {
+          "page": 1,
+          "text": "Material: Ti-6Al-4V"
+        },
+        "heat_treatment": {
+          "page": 1,
+          "text": "Heat Treatment: Annealed"
+        },
+        "characteristic_id": {
+          "page": 1,
+          "text": "Characteristic ID: DIM-001"
+        },
+        "name": {
+          "page": 1,
+          "text": "Characteristic Name: Hole diameter"
+        },
+        "nominal_mm": {
+          "page": 1,
+          "text": "Nominal (mm): 20.00"
+        },
+        "tolerance_mm": {
+          "page": 1,
+          "text": "Tolerance +/- (mm): 0.20"
+        }
+      }
+    },
+    "expected": {
+      "drawing_no": "DWG-002",
+      "part_no": "P-002",
+      "revision": "B",
+      "effective_from": "2026-01-01",
+      "material": "Ti-6Al-4V",
+      "heat_treatment": "Annealed",
+      "characteristics": [
+        {
+          "characteristic_id": "DIM-001",
+          "name": "Hole diameter",
+          "nominal_mm": 20.0,
+          "tolerance_mm": 0.2
+        }
+      ],
+      "source_file": "DWG-002_RevB.pdf",
+      "evidence": {
+        "drawing_no": {
+          "page": 1,
+          "text": "Drawing No: DWG-002"
+        },
+        "part_no": {
+          "page": 1,
+          "text": "Part No: P-002"
+        },
+        "revision": {
+          "page": 1,
+          "text": "Revision: B"
+        },
+        "effective_from": {
+          "page": 1,
+          "text": "Effective From: 2026-01-01"
+        },
+        "material": {
+          "page": 1,
+          "text": "Material: Ti-6Al-4V"
+        },
+        "heat_treatment": {
+          "page": 1,
+          "text": "Heat Treatment: Annealed"
+        },
+        "characteristic_id": {
+          "page": 1,
+          "text": "Characteristic ID: DIM-001"
+        },
+        "name": {
+          "page": 1,
+          "text": "Characteristic Name: Hole diameter"
+        },
+        "nominal_mm": {
+          "page": 1,
+          "text": "Nominal (mm): 20.00"
+        },
+        "tolerance_mm": {
+          "page": 1,
+          "text": "Tolerance +/- (mm): 0.20"
+        }
+      }
+    }
+  },
+  {
+    "name": "DWG-002_RevB.pdf: 파싱 오류",
+    "passed": true,
+    "actual": [],
+    "expected": []
+  },
+  {
+    "name": "DWG-002_RevB.pdf: 누락 항목",
+    "passed": true,
+    "actual": [],
+    "expected": []
+  },
+  {
+    "name": "DWG-002_RevB.pdf: 부품번호",
+    "passed": true,
+    "actual": "P-002",
+    "expected": "P-002"
+  },
+  {
+    "name": "DWG-002_RevC.pdf: PDF 재분석 결과와 DB 일치",
+    "passed": true,
+    "actual": {
+      "drawing_no": "DWG-002",
+      "part_no": "P-002",
+      "revision": "C",
+      "effective_from": "2026-09-20",
+      "material": "Ti-6Al-4V",
+      "heat_treatment": "STA",
+      "characteristics": [
+        {
+          "characteristic_id": "DIM-001",
+          "name": "Hole diameter",
+          "nominal_mm": 20.0,
+          "tolerance_mm": 0.1
+        }
+      ],
+      "source_file": "DWG-002_RevC.pdf",
+      "evidence": {
+        "drawing_no": {
+          "page": 1,
+          "text": "Drawing No: DWG-002"
+        },
+        "part_no": {
+          "page": 1,
+          "text": "Part No: P-002"
+        },
+        "revision": {
+          "page": 1,
+          "text": "Revision: C"
+        },
+        "effective_from": {
+          "page": 1,
+          "text": "Effective From: 2026-09-20"
+        },
+        "material": {
+          "page": 1,
+          "text": "Material: Ti-6Al-4V"
+        },
+        "heat_treatment": {
+          "page": 1,
+          "text": "Heat Treatment: STA"
+        },
+        "characteristic_id": {
+          "page": 1,
+          "text": "Characteristic ID: DIM-001"
+        },
+        "name": {
+          "page": 1,
+          "text": "Characteristic Name: Hole diameter"
+        },
+        "nominal_mm": {
+          "page": 1,
+          "text": "Nominal (mm): 20.00"
+        },
+        "tolerance_mm": {
+          "page": 1,
+          "text": "Tolerance +/- (mm): 0.10"
+        }
+      }
+    },
+    "expected": {
+      "drawing_no": "DWG-002",
+      "part_no": "P-002",
+      "revision": "C",
+      "effective_from": "2026-09-20",
+      "material": "Ti-6Al-4V",
+      "heat_treatment": "STA",
+      "characteristics": [
+        {
+          "characteristic_id": "DIM-001",
+          "name": "Hole diameter",
+          "nominal_mm": 20.0,
+          "tolerance_mm": 0.1
+        }
+      ],
+      "source_file": "DWG-002_RevC.pdf",
+      "evidence": {
+        "drawing_no": {
+          "page": 1,
+          "text": "Drawing No: DWG-002"
+        },
+        "part_no": {
+          "page": 1,
+          "text": "Part No: P-002"
+        },
+        "revision": {
+          "page": 1,
+          "text": "Revision: C"
+        },
+        "effective_from": {
+          "page": 1,
+          "text": "Effective From: 2026-09-20"
+        },
+        "material": {
+          "page": 1,
+          "text": "Material: Ti-6Al-4V"
+        },
+        "heat_treatment": {
+          "page": 1,
+          "text": "Heat Treatment: STA"
+        },
+        "characteristic_id": {
+          "page": 1,
+          "text": "Characteristic ID: DIM-001"
+        },
+        "name": {
+          "page": 1,
+          "text": "Characteristic Name: Hole diameter"
+        },
+        "nominal_mm": {
+          "page": 1,
+          "text": "Nominal (mm): 20.00"
+        },
+        "tolerance_mm": {
+          "page": 1,
+          "text": "Tolerance +/- (mm): 0.10"
+        }
+      }
+    }
+  },
+  {
+    "name": "DWG-002_RevC.pdf: 파싱 오류",
+    "passed": true,
+    "actual": [],
+    "expected": []
+  },
+  {
+    "name": "DWG-002_RevC.pdf: 누락 항목",
+    "passed": true,
+    "actual": [],
+    "expected": []
+  },
+  {
+    "name": "DWG-002_RevC.pdf: 부품번호",
+    "passed": true,
+    "actual": "P-002",
+    "expected": "P-002"
+  },
+  {
+    "name": "DWG-002_RevC.pdf: 도면과 Lot의 적용일 일치",
+    "passed": true,
+    "actual": "2026-09-20",
+    "expected": "2026-09-20"
+  },
+  {
+    "name": "새 도면 기준 치수",
+    "passed": true,
+    "actual": 20.0,
+    "expected": 20.0
+  },
+  {
+    "name": "새 도면 공차",
+    "passed": true,
+    "actual": 0.1,
+    "expected": 0.1
+  },
+  {
+    "name": "INS-008.pdf: PDF 재분석 결과와 DB 일치",
+    "passed": true,
+    "actual": {
+      "document_id": "INS-008",
+      "part_no": "P-002",
+      "po_no": "PO-003",
+      "lot_no": "LOT-008",
+      "production_date": "2026-09-22",
+      "revision": "C",
+      "characteristic_id": "DIM-001",
+      "nominal_mm": 20.0,
+      "tolerance_mm": 0.1,
+      "measured_mm": 20.15,
+      "source_file": "INS-008.pdf",
+      "evidence": {
+        "document_id": {
+          "page": 1,
+          "text": "Document ID: INS-008"
+        },
+        "part_no": {
+          "page": 1,
+          "text": "Part No: P-002"
+        },
+        "po_no": {
+          "page": 1,
+          "text": "PO No: PO-003"
+        },
+        "lot_no": {
+          "page": 1,
+          "text": "Lot No: LOT-008"
+        },
+        "production_date": {
+          "page": 1,
+          "text": "Production Date: 2026-09-22"
+        },
+        "revision": {
+          "page": 1,
+          "text": "Drawing Revision: C"
+        },
+        "characteristic_id": {
+          "page": 1,
+          "text": "Characteristic ID: DIM-001"
+        },
+        "nominal_mm": {
+          "page": 1,
+          "text": "Nominal (mm): 20.00"
+        },
+        "tolerance_mm": {
+          "page": 1,
+          "text": "Tolerance +/- (mm): 0.10"
+        },
+        "measured_mm": {
+          "page": 1,
+          "text": "Measured (mm): 20.15"
+        }
+      },
+      "errors": [],
+      "missing_fields": []
+    },
+    "expected": {
+      "document_id": "INS-008",
+      "part_no": "P-002",
+      "po_no": "PO-003",
+      "lot_no": "LOT-008",
+      "production_date": "2026-09-22",
+      "revision": "C",
+      "characteristic_id": "DIM-001",
+      "nominal_mm": 20.0,
+      "tolerance_mm": 0.1,
+      "measured_mm": 20.15,
+      "source_file": "INS-008.pdf",
+      "evidence": {
+        "document_id": {
+          "page": 1,
+          "text": "Document ID: INS-008"
+        },
+        "part_no": {
+          "page": 1,
+          "text": "Part No: P-002"
+        },
+        "po_no": {
+          "page": 1,
+          "text": "PO No: PO-003"
+        },
+        "lot_no": {
+          "page": 1,
+          "text": "Lot No: LOT-008"
+        },
+        "production_date": {
+          "page": 1,
+          "text": "Production Date: 2026-09-22"
+        },
+        "revision": {
+          "page": 1,
+          "text": "Drawing Revision: C"
+        },
+        "characteristic_id": {
+          "page": 1,
+          "text": "Characteristic ID: DIM-001"
+        },
+        "nominal_mm": {
+          "page": 1,
+          "text": "Nominal (mm): 20.00"
+        },
+        "tolerance_mm": {
+          "page": 1,
+          "text": "Tolerance +/- (mm): 0.10"
+        },
+        "measured_mm": {
+          "page": 1,
+          "text": "Measured (mm): 20.15"
+        }
+      },
+      "errors": [],
+      "missing_fields": []
+    }
+  },
+  {
+    "name": "INS-008.pdf: 파싱 오류",
+    "passed": true,
+    "actual": [],
+    "expected": []
+  },
+  {
+    "name": "INS-008.pdf: 누락 항목",
+    "passed": true,
+    "actual": [],
+    "expected": []
+  },
+  {
+    "name": "INS-008.pdf: 부품번호",
+    "passed": true,
+    "actual": "P-002",
+    "expected": "P-002"
+  },
+  {
+    "name": "INS-008.pdf: lot_no",
+    "passed": true,
+    "actual": "LOT-008",
+    "expected": "LOT-008"
+  },
+  {
+    "name": "INS-008.pdf: po_no",
+    "passed": true,
+    "actual": "PO-003",
+    "expected": "PO-003"
+  },
+  {
+    "name": "INS-008.pdf: Lot 테이블의 production_date와 일치",
+    "passed": true,
+    "actual": "2026-09-22",
+    "expected": "2026-09-22"
+  },
+  {
+    "name": "INS-008.pdf: Lot 테이블의 revision와 일치",
+    "passed": true,
+    "actual": "C",
+    "expected": "C"
+  },
+  {
+    "name": "INS-008.pdf: Lot 테이블의 nominal_mm와 일치",
+    "passed": true,
+    "actual": 20.0,
+    "expected": 20.0
+  },
+  {
+    "name": "INS-008.pdf: Lot 테이블의 tolerance_mm와 일치",
+    "passed": true,
+    "actual": 0.1,
+    "expected": 0.1
+  },
+  {
+    "name": "INS-008.pdf: Lot 테이블의 measured_mm와 일치",
+    "passed": true,
+    "actual": 20.15,
+    "expected": 20.15
+  },
+  {
+    "name": "MAT-008.pdf: PDF 재분석 결과와 DB 일치",
+    "passed": true,
+    "actual": {
+      "certificate_id": "MAT-008",
+      "certificate_type": "MATERIAL",
+      "part_no": "P-002",
+      "po_no": "PO-003",
+      "lot_no": "LOT-008",
+      "supplier_id": "SUP-001",
+      "material": "Ti-6Al-4V",
+      "heat_treatment": "STA",
+      "heat_no": "HEAT-T008",
+      "source_file": "MAT-008.pdf",
+      "evidence": {
+        "certificate_id": {
+          "page": 1,
+          "text": "Certificate ID: MAT-008"
+        },
+        "certificate_type": {
+          "page": 1,
+          "text": "Certificate Type: MATERIAL"
+        },
+        "part_no": {
+          "page": 1,
+          "text": "Part No: P-002"
+        },
+        "po_no": {
+          "page": 1,
+          "text": "PO No: PO-003"
+        },
+        "lot_no": {
+          "page": 1,
+          "text": "Lot No: LOT-008"
+        },
+        "supplier_id": {
+          "page": 1,
+          "text": "Supplier ID: SUP-001"
+        },
+        "material": {
+          "page": 1,
+          "text": "Material: Ti-6Al-4V"
+        },
+        "heat_treatment": {
+          "page": 1,
+          "text": "Heat Treatment: STA"
+        },
+        "heat_no": {
+          "page": 1,
+          "text": "Heat No: HEAT-T008"
+        }
+      }
+    },
+    "expected": {
+      "certificate_id": "MAT-008",
+      "certificate_type": "MATERIAL",
+      "part_no": "P-002",
+      "po_no": "PO-003",
+      "lot_no": "LOT-008",
+      "supplier_id": "SUP-001",
+      "material": "Ti-6Al-4V",
+      "heat_treatment": "STA",
+      "heat_no": "HEAT-T008",
+      "source_file": "MAT-008.pdf",
+      "evidence": {
+        "certificate_id": {
+          "page": 1,
+          "text": "Certificate ID: MAT-008"
+        },
+        "certificate_type": {
+          "page": 1,
+          "text": "Certificate Type: MATERIAL"
+        },
+        "part_no": {
+          "page": 1,
+          "text": "Part No: P-002"
+        },
+        "po_no": {
+          "page": 1,
+          "text": "PO No: PO-003"
+        },
+        "lot_no": {
+          "page": 1,
+          "text": "Lot No: LOT-008"
+        },
+        "supplier_id": {
+          "page": 1,
+          "text": "Supplier ID: SUP-001"
+        },
+        "material": {
+          "page": 1,
+          "text": "Material: Ti-6Al-4V"
+        },
+        "heat_treatment": {
+          "page": 1,
+          "text": "Heat Treatment: STA"
+        },
+        "heat_no": {
+          "page": 1,
+          "text": "Heat No: HEAT-T008"
+        }
+      }
+    }
+  },
+  {
+    "name": "MAT-008.pdf: 파싱 오류",
+    "passed": true,
+    "actual": [],
+    "expected": []
+  },
+  {
+    "name": "MAT-008.pdf: 누락 항목",
+    "passed": true,
+    "actual": [],
+    "expected": []
+  },
+  {
+    "name": "MAT-008.pdf: 부품번호",
+    "passed": true,
+    "actual": "P-002",
+    "expected": "P-002"
+  },
+  {
+    "name": "MAT-008.pdf: lot_no",
+    "passed": true,
+    "actual": "LOT-008",
+    "expected": "LOT-008"
+  },
+  {
+    "name": "MAT-008.pdf: po_no",
+    "passed": true,
+    "actual": "PO-003",
+    "expected": "PO-003"
+  },
+  {
+    "name": "HT-008.pdf: PDF 재분석 결과와 DB 일치",
+    "passed": true,
+    "actual": {
+      "certificate_id": "HT-008",
+      "certificate_type": "HEAT_TREATMENT",
+      "part_no": "P-002",
+      "po_no": "PO-003",
+      "lot_no": "LOT-008",
+      "supplier_id": "SUP-001",
+      "material": "Ti-6Al-4V",
+      "heat_treatment": "STA",
+      "heat_no": "HEAT-T008",
+      "source_file": "HT-008.pdf",
+      "evidence": {
+        "certificate_id": {
+          "page": 1,
+          "text": "Certificate ID: HT-008"
+        },
+        "certificate_type": {
+          "page": 1,
+          "text": "Certificate Type: HEAT_TREATMENT"
+        },
+        "part_no": {
+          "page": 1,
+          "text": "Part No: P-002"
+        },
+        "po_no": {
+          "page": 1,
+          "text": "PO No: PO-003"
+        },
+        "lot_no": {
+          "page": 1,
+          "text": "Lot No: LOT-008"
+        },
+        "supplier_id": {
+          "page": 1,
+          "text": "Supplier ID: SUP-001"
+        },
+        "material": {
+          "page": 1,
+          "text": "Material: Ti-6Al-4V"
+        },
+        "heat_treatment": {
+          "page": 1,
+          "text": "Heat Treatment: STA"
+        },
+        "heat_no": {
+          "page": 1,
+          "text": "Heat No: HEAT-T008"
+        }
+      }
+    },
+    "expected": {
+      "certificate_id": "HT-008",
+      "certificate_type": "HEAT_TREATMENT",
+      "part_no": "P-002",
+      "po_no": "PO-003",
+      "lot_no": "LOT-008",
+      "supplier_id": "SUP-001",
+      "material": "Ti-6Al-4V",
+      "heat_treatment": "STA",
+      "heat_no": "HEAT-T008",
+      "source_file": "HT-008.pdf",
+      "evidence": {
+        "certificate_id": {
+          "page": 1,
+          "text": "Certificate ID: HT-008"
+        },
+        "certificate_type": {
+          "page": 1,
+          "text": "Certificate Type: HEAT_TREATMENT"
+        },
+        "part_no": {
+          "page": 1,
+          "text": "Part No: P-002"
+        },
+        "po_no": {
+          "page": 1,
+          "text": "PO No: PO-003"
+        },
+        "lot_no": {
+          "page": 1,
+          "text": "Lot No: LOT-008"
+        },
+        "supplier_id": {
+          "page": 1,
+          "text": "Supplier ID: SUP-001"
+        },
+        "material": {
+          "page": 1,
+          "text": "Material: Ti-6Al-4V"
+        },
+        "heat_treatment": {
+          "page": 1,
+          "text": "Heat Treatment: STA"
+        },
+        "heat_no": {
+          "page": 1,
+          "text": "Heat No: HEAT-T008"
+        }
+      }
+    }
+  },
+  {
+    "name": "HT-008.pdf: 파싱 오류",
+    "passed": true,
+    "actual": [],
+    "expected": []
+  },
+  {
+    "name": "HT-008.pdf: 누락 항목",
+    "passed": true,
+    "actual": [],
+    "expected": []
+  },
+  {
+    "name": "HT-008.pdf: 부품번호",
+    "passed": true,
+    "actual": "P-002",
+    "expected": "P-002"
+  },
+  {
+    "name": "HT-008.pdf: lot_no",
+    "passed": true,
+    "actual": "LOT-008",
+    "expected": "LOT-008"
+  },
+  {
+    "name": "HT-008.pdf: po_no",
+    "passed": true,
+    "actual": "PO-003",
+    "expected": "PO-003"
+  },
+  {
+    "name": "정상적으로 읽은 PDF 개수",
+    "passed": true,
+    "actual": 5,
+    "expected": 5
+  },
+  {
+    "name": "DB 자료: 변경 적용 대상",
+    "passed": true,
+    "actual": "IN_EFFECTIVITY_SCOPE",
+    "expected": "IN_EFFECTIVITY_SCOPE"
+  },
+  {
+    "name": "DB 자료: 영향 Lot 목록",
+    "passed": true,
+    "actual": [
+      "LOT-008"
+    ],
+    "expected": [
+      "LOT-008"
+    ]
+  },
+  {
+    "name": "DB 자료: 공차 초과 불합격 판정",
+    "passed": true,
+    "actual": [
+      [
+        "REJECT",
+        "DIMENSION_OUT_OF_TOLERANCE"
+      ]
+    ],
+    "expected": [
+      [
+        "REJECT",
+        "DIMENSION_OUT_OF_TOLERANCE"
+      ]
+    ]
+  },
+  {
+    "name": "다시 읽은 PDF 자료: 변경 적용 대상",
+    "passed": true,
+    "actual": "IN_EFFECTIVITY_SCOPE",
+    "expected": "IN_EFFECTIVITY_SCOPE"
+  },
+  {
+    "name": "다시 읽은 PDF 자료: 영향 Lot 목록",
+    "passed": true,
+    "actual": [
+      "LOT-008"
+    ],
+    "expected": [
+      "LOT-008"
+    ]
+  },
+  {
+    "name": "다시 읽은 PDF 자료: 공차 초과 불합격 판정",
+    "passed": true,
+    "actual": [
+      [
+        "REJECT",
+        "DIMENSION_OUT_OF_TOLERANCE"
+      ]
+    ],
+    "expected": [
+      [
+        "REJECT",
+        "DIMENSION_OUT_OF_TOLERANCE"
+      ]
+    ]
+  },
+  {
+    "name": "생산일 2026-09-19: 적용 범위",
+    "passed": true,
+    "actual": "BEFORE_EFFECTIVITY",
+    "expected": "BEFORE_EFFECTIVITY"
+  },
+  {
+    "name": "생산일 2026-09-19: 영향 Lot 목록",
+    "passed": true,
+    "actual": [],
+    "expected": []
+  },
+  {
+    "name": "적용일 이전 Lot은 품질판정 대상에서 제외",
+    "passed": true,
+    "actual": [],
+    "expected": []
+  },
+  {
+    "name": "생산일 2026-09-20: 적용 범위",
+    "passed": true,
+    "actual": "IN_EFFECTIVITY_SCOPE",
+    "expected": "IN_EFFECTIVITY_SCOPE"
+  },
+  {
+    "name": "생산일 2026-09-20: 영향 Lot 목록",
+    "passed": true,
+    "actual": [
+      "LOT-008"
+    ],
+    "expected": [
+      "LOT-008"
+    ]
+  },
+  {
+    "name": "생산일 2026-09-21: 적용 범위",
+    "passed": true,
+    "actual": "IN_EFFECTIVITY_SCOPE",
+    "expected": "IN_EFFECTIVITY_SCOPE"
+  },
+  {
+    "name": "생산일 2026-09-21: 영향 Lot 목록",
+    "passed": true,
+    "actual": [
+      "LOT-008"
+    ],
+    "expected": [
+      "LOT-008"
+    ]
+  }
+]
