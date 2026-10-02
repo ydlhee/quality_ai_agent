@@ -23,6 +23,13 @@ def create_initial_state(case_id: str):
         "missing_items": [],
         "evidence": [],
 
+        # 자율 판단 및 검증계획 조정 상태
+        "agent_phase": "INITIAL",
+        "plan_review_completed": False,
+        "additional_checks": [],
+        "pending_actions": [],
+        "plan_adjustments": [],
+
         # Tool 실행 결과 및 Agent 기록
         "tool_results": {},
         "history": [],

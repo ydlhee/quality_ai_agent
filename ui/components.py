@@ -86,28 +86,67 @@ def show_result(state):
 
 
 def show_followup(state):
-    """후속조치 결과를 표 형태로 표시한다."""
+    """후속조치 결과와 SCAR 초안을 표시한다."""
     st.subheader("후속조치")
-    followup = state["tool_results"].get("followup")
+
+    followup = state.get("tool_results", {}).get("followup")
+
     if not followup:
-        if state["decision"] == "PASS":
+        if state.get("decision") == "PASS":
             st.success("PASS Case로 추가 후속조치가 필요하지 않습니다.")
         else:
             st.write("후속조치가 실행되지 않았습니다.")
         return
+
     actions = followup.get("result", {}).get("actions", [])
+
     if not actions:
         st.write("필요한 후속조치가 없습니다.")
         return
+
+    # 기존 후속조치 표
     action_rows = []
+
     for item in actions:
         action_rows.append({
             "Lot": item.get("lot_id", "-"),
             "조치": item.get("action", "-"),
             "내용": item.get("description", "-"),
         })
-    st.dataframe(action_rows, use_container_width=True, hide_index=True)
 
+    st.dataframe(
+        action_rows,
+        use_container_width=True,
+        hide_index=True
+    )
+
+    # REJECT 판정 시 SCAR 초안 상세 표시
+    for item in actions:
+        scar = item.get("scar_draft")
+
+        if item.get("action") != "REJECT_LOT" or not scar:
+            continue
+
+        with st.expander(
+            f"SCAR 초안 상세 보기 - {item.get('lot_id', '-')}"
+        ):
+            st.warning(
+                "아래 내용은 자동 생성된 초안이며 "
+                "담당자 검토 및 승인 후 전달해야 합니다."
+            )
+
+            st.write("**대상 Lot:**", item.get("lot_id", "-"))
+            st.write("**부적합 코드:**", item.get("issue_code", "-"))
+            st.write("**부적합 내용:**", item.get("issue", "-"))
+
+            st.subheader("SCAR 초안")
+            st.json(scar, expanded=True)
+
+            revalidation = item.get("revalidation")
+
+            if revalidation:
+                st.subheader("재검증 조건")
+                st.json(revalidation, expanded=True)
 
 def show_agent_trace(state):
     """Agent의 Tool 선택 이유, 판단 출처 및 실행 결과를 표시한다."""
