@@ -128,26 +128,6 @@ def evaluate_quality(
             "inspection_revision"
         )
     )
-
-    if (
-        inspection_revision
-        and required_revision
-        and inspection_revision
-        != required_revision
-    ):
-        return make_result(
-            "HOLD",
-            "REVISION_MISMATCH",
-            (
-                f"검사성적서 Revision 불일치 "
-                f"(요구: {required_revision}, "
-                f"실제: {inspection_revision})"
-            ),
-            required_revision,
-            inspection_revision
-        )
-
-
     # ==================================
     # 4. Material
     # ==================================
@@ -363,6 +343,23 @@ def evaluate_quality(
                 ),
                 measured
             )
+    if (
+        inspection_revision
+        and required_revision
+        and inspection_revision
+        != required_revision
+    ):
+        return make_result(
+            "HOLD",
+            "REVISION_MISMATCH",
+            (
+                f"검사성적서 Revision 불일치 "
+                f"(요구: {required_revision}, "
+                f"실제: {inspection_revision})"
+            ),
+            required_revision,
+            inspection_revision
+        )
 
 
     # ==================================

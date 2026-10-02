@@ -1,0 +1,834 @@
+[
+  {
+    "case_id": "QA-001",
+    "title": "Effectivity 당일 새 Revision 적용",
+    "synthetic_fixture": true,
+    "oracle_status": "DEFINED",
+    "expected": {
+      "decision": "PASS",
+      "issue_code": "NO_ISSUE",
+      "scope": "IN_EFFECTIVITY_SCOPE"
+    },
+    "design_requirements": {
+      "new_revision": "C",
+      "effectivity": "2026-09-15",
+      "nominal_mm": "20.0",
+      "tolerance_mm": "0.1",
+      "lower_mm": "19.9",
+      "upper_mm": "20.1",
+      "material": "AL7075",
+      "heat_treatment": "T6"
+    },
+    "actual_data": {
+      "lot": {
+        "lot_no": "LOT-QA-001",
+        "part_no": "A1001",
+        "revision": "C",
+        "production_date": "2026-09-15",
+        "effectivity_date": "2026-09-15"
+      },
+      "inspection": {
+        "lot_no": "LOT-QA-001",
+        "revision": "C",
+        "measured_mm": 20.05,
+        "part_no": "A1001"
+      },
+      "material_certificate": {
+        "lot_no": "LOT-QA-001",
+        "material": "AL7075",
+        "heat_no": "HEAT-100",
+        "part_no": "A1001"
+      },
+      "heat_certificate": {
+        "lot_no": "LOT-QA-001",
+        "heat_treatment": "T6",
+        "heat_no": "HEAT-100",
+        "part_no": "A1001"
+      },
+      "missing_document_types": []
+    },
+    "independent_checks": {
+      "in_effectivity_scope": true,
+      "within_new_tolerance": true,
+      "inspection_lot_matches": true
+    },
+    "reason": "지정 항목 이외에는 정상 조건이며, 실제 Tool 판정은 아직 실행하지 않았습니다.",
+    "evidence": [
+      {
+        "document_type": "DRAWING",
+        "file_name": "QA-001_rev_b.json",
+        "json_pointer": "/phases/0/case_data/documents/0/structured_data"
+      },
+      {
+        "document_type": "DRAWING",
+        "file_name": "QA-001_rev_c.json",
+        "json_pointer": "/phases/0/case_data/documents/1/structured_data"
+      },
+      {
+        "document_type": "INSPECTION_REPORT",
+        "file_name": "QA-001_inspection.json",
+        "json_pointer": "/phases/0/case_data/documents/2/structured_data"
+      },
+      {
+        "document_type": "MATERIAL_CERTIFICATE",
+        "file_name": "QA-001_material.json",
+        "json_pointer": "/phases/0/case_data/documents/3/structured_data"
+      },
+      {
+        "document_type": "HEAT_TREATMENT_CERTIFICATE",
+        "file_name": "QA-001_heat.json",
+        "json_pointer": "/phases/0/case_data/documents/4/structured_data"
+      }
+    ],
+    "actual_result": null,
+    "execution_status": "NOT_RUN"
+  },
+  {
+    "case_id": "QA-002",
+    "title": "Effectivity 전날 구 Revision 생산",
+    "synthetic_fixture": true,
+    "oracle_status": "DEFINED",
+    "expected": {
+      "decision": "EXCLUDED",
+      "issue_code": null,
+      "scope": "BEFORE_EFFECTIVITY"
+    },
+    "design_requirements": {
+      "new_revision": "C",
+      "effectivity": "2026-09-15",
+      "nominal_mm": "20.0",
+      "tolerance_mm": "0.1",
+      "lower_mm": "19.9",
+      "upper_mm": "20.1",
+      "material": "AL7075",
+      "heat_treatment": "T6"
+    },
+    "actual_data": {
+      "lot": {
+        "lot_no": "LOT-QA-002",
+        "part_no": "A1001",
+        "revision": "B",
+        "production_date": "2026-09-14",
+        "effectivity_date": "2026-09-15"
+      },
+      "inspection": {
+        "lot_no": "LOT-QA-002",
+        "revision": "B",
+        "measured_mm": 20.05,
+        "part_no": "A1001"
+      },
+      "material_certificate": {
+        "lot_no": "LOT-QA-002",
+        "material": "AL7075",
+        "heat_no": "HEAT-100",
+        "part_no": "A1001"
+      },
+      "heat_certificate": {
+        "lot_no": "LOT-QA-002",
+        "heat_treatment": "T6",
+        "heat_no": "HEAT-100",
+        "part_no": "A1001"
+      },
+      "missing_document_types": []
+    },
+    "independent_checks": {
+      "in_effectivity_scope": false,
+      "within_new_tolerance": true,
+      "inspection_lot_matches": true
+    },
+    "reason": "새 Revision 변경영향 대상에서 제외합니다. 구 Revision의 품질 PASS를 의미하지 않습니다.",
+    "evidence": [
+      {
+        "document_type": "DRAWING",
+        "file_name": "QA-002_rev_b.json",
+        "json_pointer": "/phases/0/case_data/documents/0/structured_data"
+      },
+      {
+        "document_type": "DRAWING",
+        "file_name": "QA-002_rev_c.json",
+        "json_pointer": "/phases/0/case_data/documents/1/structured_data"
+      },
+      {
+        "document_type": "INSPECTION_REPORT",
+        "file_name": "QA-002_inspection.json",
+        "json_pointer": "/phases/0/case_data/documents/2/structured_data"
+      },
+      {
+        "document_type": "MATERIAL_CERTIFICATE",
+        "file_name": "QA-002_material.json",
+        "json_pointer": "/phases/0/case_data/documents/3/structured_data"
+      },
+      {
+        "document_type": "HEAT_TREATMENT_CERTIFICATE",
+        "file_name": "QA-002_heat.json",
+        "json_pointer": "/phases/0/case_data/documents/4/structured_data"
+      }
+    ],
+    "actual_result": null,
+    "execution_status": "NOT_RUN"
+  },
+  {
+    "case_id": "QA-003",
+    "title": "공차 하한값 19.90",
+    "synthetic_fixture": true,
+    "oracle_status": "DEFINED",
+    "expected": {
+      "decision": "PASS",
+      "issue_code": "NO_ISSUE",
+      "scope": "IN_EFFECTIVITY_SCOPE"
+    },
+    "design_requirements": {
+      "new_revision": "C",
+      "effectivity": "2026-09-15",
+      "nominal_mm": "20.0",
+      "tolerance_mm": "0.1",
+      "lower_mm": "19.9",
+      "upper_mm": "20.1",
+      "material": "AL7075",
+      "heat_treatment": "T6"
+    },
+    "actual_data": {
+      "lot": {
+        "lot_no": "LOT-QA-003",
+        "part_no": "A1001",
+        "revision": "C",
+        "production_date": "2026-09-20",
+        "effectivity_date": "2026-09-15"
+      },
+      "inspection": {
+        "lot_no": "LOT-QA-003",
+        "revision": "C",
+        "measured_mm": 19.9,
+        "part_no": "A1001"
+      },
+      "material_certificate": {
+        "lot_no": "LOT-QA-003",
+        "material": "AL7075",
+        "heat_no": "HEAT-100",
+        "part_no": "A1001"
+      },
+      "heat_certificate": {
+        "lot_no": "LOT-QA-003",
+        "heat_treatment": "T6",
+        "heat_no": "HEAT-100",
+        "part_no": "A1001"
+      },
+      "missing_document_types": []
+    },
+    "independent_checks": {
+      "in_effectivity_scope": true,
+      "within_new_tolerance": true,
+      "inspection_lot_matches": true
+    },
+    "reason": "지정 항목 이외에는 정상 조건이며, 실제 Tool 판정은 아직 실행하지 않았습니다.",
+    "evidence": [
+      {
+        "document_type": "DRAWING",
+        "file_name": "QA-003_rev_b.json",
+        "json_pointer": "/phases/0/case_data/documents/0/structured_data"
+      },
+      {
+        "document_type": "DRAWING",
+        "file_name": "QA-003_rev_c.json",
+        "json_pointer": "/phases/0/case_data/documents/1/structured_data"
+      },
+      {
+        "document_type": "INSPECTION_REPORT",
+        "file_name": "QA-003_inspection.json",
+        "json_pointer": "/phases/0/case_data/documents/2/structured_data"
+      },
+      {
+        "document_type": "MATERIAL_CERTIFICATE",
+        "file_name": "QA-003_material.json",
+        "json_pointer": "/phases/0/case_data/documents/3/structured_data"
+      },
+      {
+        "document_type": "HEAT_TREATMENT_CERTIFICATE",
+        "file_name": "QA-003_heat.json",
+        "json_pointer": "/phases/0/case_data/documents/4/structured_data"
+      }
+    ],
+    "actual_result": null,
+    "execution_status": "NOT_RUN"
+  },
+  {
+    "case_id": "QA-004",
+    "title": "공차 상한값 20.10",
+    "synthetic_fixture": true,
+    "oracle_status": "DEFINED",
+    "expected": {
+      "decision": "PASS",
+      "issue_code": "NO_ISSUE",
+      "scope": "IN_EFFECTIVITY_SCOPE"
+    },
+    "design_requirements": {
+      "new_revision": "C",
+      "effectivity": "2026-09-15",
+      "nominal_mm": "20.0",
+      "tolerance_mm": "0.1",
+      "lower_mm": "19.9",
+      "upper_mm": "20.1",
+      "material": "AL7075",
+      "heat_treatment": "T6"
+    },
+    "actual_data": {
+      "lot": {
+        "lot_no": "LOT-QA-004",
+        "part_no": "A1001",
+        "revision": "C",
+        "production_date": "2026-09-20",
+        "effectivity_date": "2026-09-15"
+      },
+      "inspection": {
+        "lot_no": "LOT-QA-004",
+        "revision": "C",
+        "measured_mm": 20.1,
+        "part_no": "A1001"
+      },
+      "material_certificate": {
+        "lot_no": "LOT-QA-004",
+        "material": "AL7075",
+        "heat_no": "HEAT-100",
+        "part_no": "A1001"
+      },
+      "heat_certificate": {
+        "lot_no": "LOT-QA-004",
+        "heat_treatment": "T6",
+        "heat_no": "HEAT-100",
+        "part_no": "A1001"
+      },
+      "missing_document_types": []
+    },
+    "independent_checks": {
+      "in_effectivity_scope": true,
+      "within_new_tolerance": true,
+      "inspection_lot_matches": true
+    },
+    "reason": "지정 항목 이외에는 정상 조건이며, 실제 Tool 판정은 아직 실행하지 않았습니다.",
+    "evidence": [
+      {
+        "document_type": "DRAWING",
+        "file_name": "QA-004_rev_b.json",
+        "json_pointer": "/phases/0/case_data/documents/0/structured_data"
+      },
+      {
+        "document_type": "DRAWING",
+        "file_name": "QA-004_rev_c.json",
+        "json_pointer": "/phases/0/case_data/documents/1/structured_data"
+      },
+      {
+        "document_type": "INSPECTION_REPORT",
+        "file_name": "QA-004_inspection.json",
+        "json_pointer": "/phases/0/case_data/documents/2/structured_data"
+      },
+      {
+        "document_type": "MATERIAL_CERTIFICATE",
+        "file_name": "QA-004_material.json",
+        "json_pointer": "/phases/0/case_data/documents/3/structured_data"
+      },
+      {
+        "document_type": "HEAT_TREATMENT_CERTIFICATE",
+        "file_name": "QA-004_heat.json",
+        "json_pointer": "/phases/0/case_data/documents/4/structured_data"
+      }
+    ],
+    "actual_result": null,
+    "execution_status": "NOT_RUN"
+  },
+  {
+    "case_id": "QA-005",
+    "title": "공차 상한 초과 20.11",
+    "synthetic_fixture": true,
+    "oracle_status": "DEFINED",
+    "expected": {
+      "decision": "REJECT",
+      "issue_code": "DIMENSION_OUT_OF_TOLERANCE",
+      "scope": "IN_EFFECTIVITY_SCOPE"
+    },
+    "design_requirements": {
+      "new_revision": "C",
+      "effectivity": "2026-09-15",
+      "nominal_mm": "20.0",
+      "tolerance_mm": "0.1",
+      "lower_mm": "19.9",
+      "upper_mm": "20.1",
+      "material": "AL7075",
+      "heat_treatment": "T6"
+    },
+    "actual_data": {
+      "lot": {
+        "lot_no": "LOT-QA-005",
+        "part_no": "A1001",
+        "revision": "C",
+        "production_date": "2026-09-20",
+        "effectivity_date": "2026-09-15"
+      },
+      "inspection": {
+        "lot_no": "LOT-QA-005",
+        "revision": "C",
+        "measured_mm": 20.11,
+        "part_no": "A1001"
+      },
+      "material_certificate": {
+        "lot_no": "LOT-QA-005",
+        "material": "AL7075",
+        "heat_no": "HEAT-100",
+        "part_no": "A1001"
+      },
+      "heat_certificate": {
+        "lot_no": "LOT-QA-005",
+        "heat_treatment": "T6",
+        "heat_no": "HEAT-100",
+        "part_no": "A1001"
+      },
+      "missing_document_types": []
+    },
+    "independent_checks": {
+      "in_effectivity_scope": true,
+      "within_new_tolerance": false,
+      "inspection_lot_matches": true
+    },
+    "reason": "지정 항목 이외에는 정상 조건이며, 실제 Tool 판정은 아직 실행하지 않았습니다.",
+    "evidence": [
+      {
+        "document_type": "DRAWING",
+        "file_name": "QA-005_rev_b.json",
+        "json_pointer": "/phases/0/case_data/documents/0/structured_data"
+      },
+      {
+        "document_type": "DRAWING",
+        "file_name": "QA-005_rev_c.json",
+        "json_pointer": "/phases/0/case_data/documents/1/structured_data"
+      },
+      {
+        "document_type": "INSPECTION_REPORT",
+        "file_name": "QA-005_inspection.json",
+        "json_pointer": "/phases/0/case_data/documents/2/structured_data"
+      },
+      {
+        "document_type": "MATERIAL_CERTIFICATE",
+        "file_name": "QA-005_material.json",
+        "json_pointer": "/phases/0/case_data/documents/3/structured_data"
+      },
+      {
+        "document_type": "HEAT_TREATMENT_CERTIFICATE",
+        "file_name": "QA-005_heat.json",
+        "json_pointer": "/phases/0/case_data/documents/4/structured_data"
+      }
+    ],
+    "actual_result": null,
+    "execution_status": "NOT_RUN"
+  },
+  {
+    "case_id": "QA-006",
+    "title": "Lot C, 검사성적서만 B",
+    "synthetic_fixture": true,
+    "oracle_status": "DEFINED",
+    "expected": {
+      "decision": "HOLD",
+      "issue_code": "REVISION_MISMATCH",
+      "scope": "IN_EFFECTIVITY_SCOPE"
+    },
+    "design_requirements": {
+      "new_revision": "C",
+      "effectivity": "2026-09-15",
+      "nominal_mm": "20.0",
+      "tolerance_mm": "0.1",
+      "lower_mm": "19.9",
+      "upper_mm": "20.1",
+      "material": "AL7075",
+      "heat_treatment": "T6"
+    },
+    "actual_data": {
+      "lot": {
+        "lot_no": "LOT-QA-006",
+        "part_no": "A1001",
+        "revision": "C",
+        "production_date": "2026-09-20",
+        "effectivity_date": "2026-09-15"
+      },
+      "inspection": {
+        "lot_no": "LOT-QA-006",
+        "revision": "B",
+        "measured_mm": 20.05,
+        "part_no": "A1001"
+      },
+      "material_certificate": {
+        "lot_no": "LOT-QA-006",
+        "material": "AL7075",
+        "heat_no": "HEAT-100",
+        "part_no": "A1001"
+      },
+      "heat_certificate": {
+        "lot_no": "LOT-QA-006",
+        "heat_treatment": "T6",
+        "heat_no": "HEAT-100",
+        "part_no": "A1001"
+      },
+      "missing_document_types": []
+    },
+    "independent_checks": {
+      "in_effectivity_scope": true,
+      "within_new_tolerance": true,
+      "inspection_lot_matches": true
+    },
+    "reason": "지정 항목 이외에는 정상 조건이며, 실제 Tool 판정은 아직 실행하지 않았습니다.",
+    "evidence": [
+      {
+        "document_type": "DRAWING",
+        "file_name": "QA-006_rev_b.json",
+        "json_pointer": "/phases/0/case_data/documents/0/structured_data"
+      },
+      {
+        "document_type": "DRAWING",
+        "file_name": "QA-006_rev_c.json",
+        "json_pointer": "/phases/0/case_data/documents/1/structured_data"
+      },
+      {
+        "document_type": "INSPECTION_REPORT",
+        "file_name": "QA-006_inspection.json",
+        "json_pointer": "/phases/0/case_data/documents/2/structured_data"
+      },
+      {
+        "document_type": "MATERIAL_CERTIFICATE",
+        "file_name": "QA-006_material.json",
+        "json_pointer": "/phases/0/case_data/documents/3/structured_data"
+      },
+      {
+        "document_type": "HEAT_TREATMENT_CERTIFICATE",
+        "file_name": "QA-006_heat.json",
+        "json_pointer": "/phases/0/case_data/documents/4/structured_data"
+      }
+    ],
+    "actual_result": null,
+    "execution_status": "NOT_RUN"
+  },
+  {
+    "case_id": "QA-007",
+    "title": "요구 재질과 소재성적서 불일치",
+    "synthetic_fixture": true,
+    "oracle_status": "DEFINED",
+    "expected": {
+      "decision": "REJECT",
+      "issue_code": "MATERIAL_MISMATCH",
+      "scope": "IN_EFFECTIVITY_SCOPE"
+    },
+    "design_requirements": {
+      "new_revision": "C",
+      "effectivity": "2026-09-15",
+      "nominal_mm": "20.0",
+      "tolerance_mm": "0.1",
+      "lower_mm": "19.9",
+      "upper_mm": "20.1",
+      "material": "AL2024",
+      "heat_treatment": "T6"
+    },
+    "actual_data": {
+      "lot": {
+        "lot_no": "LOT-QA-007",
+        "part_no": "A1001",
+        "revision": "C",
+        "production_date": "2026-09-20",
+        "effectivity_date": "2026-09-15"
+      },
+      "inspection": {
+        "lot_no": "LOT-QA-007",
+        "revision": "C",
+        "measured_mm": 20.05,
+        "part_no": "A1001"
+      },
+      "material_certificate": {
+        "lot_no": "LOT-QA-007",
+        "material": "AL7075",
+        "heat_no": "HEAT-100",
+        "part_no": "A1001"
+      },
+      "heat_certificate": {
+        "lot_no": "LOT-QA-007",
+        "heat_treatment": "T6",
+        "heat_no": "HEAT-100",
+        "part_no": "A1001"
+      },
+      "missing_document_types": []
+    },
+    "independent_checks": {
+      "in_effectivity_scope": true,
+      "within_new_tolerance": true,
+      "inspection_lot_matches": true
+    },
+    "reason": "지정 항목 이외에는 정상 조건이며, 실제 Tool 판정은 아직 실행하지 않았습니다.",
+    "evidence": [
+      {
+        "document_type": "DRAWING",
+        "file_name": "QA-007_rev_b.json",
+        "json_pointer": "/phases/0/case_data/documents/0/structured_data"
+      },
+      {
+        "document_type": "DRAWING",
+        "file_name": "QA-007_rev_c.json",
+        "json_pointer": "/phases/0/case_data/documents/1/structured_data"
+      },
+      {
+        "document_type": "INSPECTION_REPORT",
+        "file_name": "QA-007_inspection.json",
+        "json_pointer": "/phases/0/case_data/documents/2/structured_data"
+      },
+      {
+        "document_type": "MATERIAL_CERTIFICATE",
+        "file_name": "QA-007_material.json",
+        "json_pointer": "/phases/0/case_data/documents/3/structured_data"
+      },
+      {
+        "document_type": "HEAT_TREATMENT_CERTIFICATE",
+        "file_name": "QA-007_heat.json",
+        "json_pointer": "/phases/0/case_data/documents/4/structured_data"
+      }
+    ],
+    "actual_result": null,
+    "execution_status": "NOT_RUN"
+  },
+  {
+    "case_id": "QA-008",
+    "title": "재질 변경 후 필수 소재성적서 누락",
+    "synthetic_fixture": true,
+    "oracle_status": "DEFINED",
+    "expected": {
+      "decision": "HOLD",
+      "issue_code": "REQUIRED_DOCUMENT_MISSING",
+      "scope": "IN_EFFECTIVITY_SCOPE"
+    },
+    "design_requirements": {
+      "new_revision": "C",
+      "effectivity": "2026-09-15",
+      "nominal_mm": "20.0",
+      "tolerance_mm": "0.1",
+      "lower_mm": "19.9",
+      "upper_mm": "20.1",
+      "material": "AL2024",
+      "heat_treatment": "T6"
+    },
+    "actual_data": {
+      "lot": {
+        "lot_no": "LOT-QA-008",
+        "part_no": "A1001",
+        "revision": "C",
+        "production_date": "2026-09-20",
+        "effectivity_date": "2026-09-15"
+      },
+      "inspection": {
+        "lot_no": "LOT-QA-008",
+        "revision": "C",
+        "measured_mm": 20.05,
+        "part_no": "A1001"
+      },
+      "material_certificate": null,
+      "heat_certificate": {
+        "lot_no": "LOT-QA-008",
+        "heat_treatment": "T6",
+        "heat_no": "HEAT-100",
+        "part_no": "A1001"
+      },
+      "missing_document_types": [
+        "MATERIAL_CERTIFICATE"
+      ]
+    },
+    "independent_checks": {
+      "in_effectivity_scope": true,
+      "within_new_tolerance": true,
+      "inspection_lot_matches": true
+    },
+    "reason": "재질 변경으로 소재성적서가 필수입니다. 해당 문서 자체를 제출 목록에서 제외했습니다.",
+    "evidence": [
+      {
+        "document_type": "DRAWING",
+        "file_name": "QA-008_rev_b.json",
+        "json_pointer": "/phases/0/case_data/documents/0/structured_data"
+      },
+      {
+        "document_type": "DRAWING",
+        "file_name": "QA-008_rev_c.json",
+        "json_pointer": "/phases/0/case_data/documents/1/structured_data"
+      },
+      {
+        "document_type": "INSPECTION_REPORT",
+        "file_name": "QA-008_inspection.json",
+        "json_pointer": "/phases/0/case_data/documents/2/structured_data"
+      },
+      {
+        "document_type": "HEAT_TREATMENT_CERTIFICATE",
+        "file_name": "QA-008_heat.json",
+        "json_pointer": "/phases/0/case_data/documents/3/structured_data"
+      }
+    ],
+    "actual_result": null,
+    "execution_status": "NOT_RUN"
+  },
+  {
+    "case_id": "QA-009",
+    "title": "검사성적서가 다른 Lot을 가리킴",
+    "synthetic_fixture": true,
+    "oracle_status": "PENDING_TEAM_DECISION",
+    "expected": {
+      "decision": null,
+      "issue_code": "LOT_ID_MISMATCH",
+      "scope": "IN_EFFECTIVITY_SCOPE"
+    },
+    "design_requirements": {
+      "new_revision": "C",
+      "effectivity": "2026-09-15",
+      "nominal_mm": "20.0",
+      "tolerance_mm": "0.1",
+      "lower_mm": "19.9",
+      "upper_mm": "20.1",
+      "material": "AL7075",
+      "heat_treatment": "T6"
+    },
+    "actual_data": {
+      "lot": {
+        "lot_no": "LOT-QA-009",
+        "part_no": "A1001",
+        "revision": "C",
+        "production_date": "2026-09-20",
+        "effectivity_date": "2026-09-15"
+      },
+      "inspection": {
+        "lot_no": "LOT-OTHER-999",
+        "revision": "C",
+        "measured_mm": 20.05,
+        "part_no": "A1001"
+      },
+      "material_certificate": {
+        "lot_no": "LOT-QA-009",
+        "material": "AL7075",
+        "heat_no": "HEAT-100",
+        "part_no": "A1001"
+      },
+      "heat_certificate": {
+        "lot_no": "LOT-QA-009",
+        "heat_treatment": "T6",
+        "heat_no": "HEAT-100",
+        "part_no": "A1001"
+      },
+      "missing_document_types": []
+    },
+    "independent_checks": {
+      "in_effectivity_scope": true,
+      "within_new_tolerance": true,
+      "inspection_lot_matches": false
+    },
+    "reason": "Lot 불일치 탐지는 필수입니다. HOLD/REJECT 선택은 팀 합의 후 확정하며, PASS는 허용하지 않습니다.",
+    "evidence": [
+      {
+        "document_type": "DRAWING",
+        "file_name": "QA-009_rev_b.json",
+        "json_pointer": "/phases/0/case_data/documents/0/structured_data"
+      },
+      {
+        "document_type": "DRAWING",
+        "file_name": "QA-009_rev_c.json",
+        "json_pointer": "/phases/0/case_data/documents/1/structured_data"
+      },
+      {
+        "document_type": "INSPECTION_REPORT",
+        "file_name": "QA-009_inspection.json",
+        "json_pointer": "/phases/0/case_data/documents/2/structured_data"
+      },
+      {
+        "document_type": "MATERIAL_CERTIFICATE",
+        "file_name": "QA-009_material.json",
+        "json_pointer": "/phases/0/case_data/documents/3/structured_data"
+      },
+      {
+        "document_type": "HEAT_TREATMENT_CERTIFICATE",
+        "file_name": "QA-009_heat.json",
+        "json_pointer": "/phases/0/case_data/documents/4/structured_data"
+      }
+    ],
+    "actual_result": null,
+    "execution_status": "NOT_RUN"
+  },
+  {
+    "case_id": "QA-010",
+    "title": "구버전 검사성적서와 공차 초과 동시 발생",
+    "synthetic_fixture": true,
+    "oracle_status": "DEFINED",
+    "expected": {
+      "decision": "REJECT",
+      "issue_code": "DIMENSION_OUT_OF_TOLERANCE",
+      "scope": "IN_EFFECTIVITY_SCOPE"
+    },
+    "design_requirements": {
+      "new_revision": "C",
+      "effectivity": "2026-09-15",
+      "nominal_mm": "20.0",
+      "tolerance_mm": "0.1",
+      "lower_mm": "19.9",
+      "upper_mm": "20.1",
+      "material": "AL7075",
+      "heat_treatment": "T6"
+    },
+    "actual_data": {
+      "lot": {
+        "lot_no": "LOT-QA-010",
+        "part_no": "A1001",
+        "revision": "C",
+        "production_date": "2026-09-20",
+        "effectivity_date": "2026-09-15"
+      },
+      "inspection": {
+        "lot_no": "LOT-QA-010",
+        "revision": "B",
+        "measured_mm": 20.11,
+        "part_no": "A1001"
+      },
+      "material_certificate": {
+        "lot_no": "LOT-QA-010",
+        "material": "AL7075",
+        "heat_no": "HEAT-100",
+        "part_no": "A1001"
+      },
+      "heat_certificate": {
+        "lot_no": "LOT-QA-010",
+        "heat_treatment": "T6",
+        "heat_no": "HEAT-100",
+        "part_no": "A1001"
+      },
+      "missing_document_types": []
+    },
+    "independent_checks": {
+      "in_effectivity_scope": true,
+      "within_new_tolerance": false,
+      "inspection_lot_matches": true
+    },
+    "reason": "같은 Lot의 20.11은 구 공차 19.80~20.20 안이지만 새 공차 19.90~20.10 밖입니다. 확인된 공차 초과가 문서 HOLD에 가려지는지 확인합니다.",
+    "evidence": [
+      {
+        "document_type": "DRAWING",
+        "file_name": "QA-010_rev_b.json",
+        "json_pointer": "/phases/0/case_data/documents/0/structured_data"
+      },
+      {
+        "document_type": "DRAWING",
+        "file_name": "QA-010_rev_c.json",
+        "json_pointer": "/phases/0/case_data/documents/1/structured_data"
+      },
+      {
+        "document_type": "INSPECTION_REPORT",
+        "file_name": "QA-010_inspection.json",
+        "json_pointer": "/phases/0/case_data/documents/2/structured_data"
+      },
+      {
+        "document_type": "MATERIAL_CERTIFICATE",
+        "file_name": "QA-010_material.json",
+        "json_pointer": "/phases/0/case_data/documents/3/structured_data"
+      },
+      {
+        "document_type": "HEAT_TREATMENT_CERTIFICATE",
+        "file_name": "QA-010_heat.json",
+        "json_pointer": "/phases/0/case_data/documents/4/structured_data"
+      }
+    ],
+    "actual_result": null,
+    "execution_status": "NOT_RUN"
+  }
+]

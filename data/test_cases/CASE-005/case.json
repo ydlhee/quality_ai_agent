@@ -1,0 +1,10 @@
+{
+  "case_id": "CASE-005",
+  "part_id": "A1001",
+  "old_revision": "B",
+  "new_revision": "C",
+  "expected_material": "AL2024",
+  "nominal": 20.0,
+  "tolerance": 0.1,
+  "expected_decision": "REJECT"
+}

@@ -1,0 +1,84 @@
+{
+  "case_id": "QA-010",
+  "title": "구버전 검사성적서와 공차 초과 동시 발생",
+  "synthetic_fixture": true,
+  "oracle_status": "DEFINED",
+  "expected": {
+    "decision": "REJECT",
+    "issue_code": "DIMENSION_OUT_OF_TOLERANCE",
+    "scope": "IN_EFFECTIVITY_SCOPE"
+  },
+  "design_requirements": {
+    "new_revision": "C",
+    "effectivity": "2026-09-15",
+    "nominal_mm": "20.0",
+    "tolerance_mm": "0.1",
+    "lower_mm": "19.9",
+    "upper_mm": "20.1",
+    "material": "AL7075",
+    "heat_treatment": "T6"
+  },
+  "actual_data": {
+    "lot": {
+      "lot_no": "LOT-QA-010",
+      "part_no": "A1001",
+      "revision": "C",
+      "production_date": "2026-09-20",
+      "effectivity_date": "2026-09-15"
+    },
+    "inspection": {
+      "lot_no": "LOT-QA-010",
+      "revision": "B",
+      "measured_mm": 20.11,
+      "part_no": "A1001"
+    },
+    "material_certificate": {
+      "lot_no": "LOT-QA-010",
+      "material": "AL7075",
+      "heat_no": "HEAT-100",
+      "part_no": "A1001"
+    },
+    "heat_certificate": {
+      "lot_no": "LOT-QA-010",
+      "heat_treatment": "T6",
+      "heat_no": "HEAT-100",
+      "part_no": "A1001"
+    },
+    "missing_document_types": []
+  },
+  "independent_checks": {
+    "in_effectivity_scope": true,
+    "within_new_tolerance": false,
+    "inspection_lot_matches": true
+  },
+  "reason": "같은 Lot의 20.11은 구 공차 19.80~20.20 안이지만 새 공차 19.90~20.10 밖입니다. 확인된 공차 초과가 문서 HOLD에 가려지는지 확인합니다.",
+  "evidence": [
+    {
+      "document_type": "DRAWING",
+      "file_name": "QA-010_rev_b.json",
+      "json_pointer": "/phases/0/case_data/documents/0/structured_data"
+    },
+    {
+      "document_type": "DRAWING",
+      "file_name": "QA-010_rev_c.json",
+      "json_pointer": "/phases/0/case_data/documents/1/structured_data"
+    },
+    {
+      "document_type": "INSPECTION_REPORT",
+      "file_name": "QA-010_inspection.json",
+      "json_pointer": "/phases/0/case_data/documents/2/structured_data"
+    },
+    {
+      "document_type": "MATERIAL_CERTIFICATE",
+      "file_name": "QA-010_material.json",
+      "json_pointer": "/phases/0/case_data/documents/3/structured_data"
+    },
+    {
+      "document_type": "HEAT_TREATMENT_CERTIFICATE",
+      "file_name": "QA-010_heat.json",
+      "json_pointer": "/phases/0/case_data/documents/4/structured_data"
+    }
+  ],
+  "actual_result": null,
+  "execution_status": "NOT_RUN"
+}
