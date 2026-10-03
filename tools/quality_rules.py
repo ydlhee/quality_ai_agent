@@ -107,7 +107,7 @@ def evaluate_quality(
         != lot_no
     ):
         return make_result(
-            "REJECT",
+            "HOLD",
             "LOT_ID_MISMATCH",
             (
                 f"Lot 번호 불일치 "
