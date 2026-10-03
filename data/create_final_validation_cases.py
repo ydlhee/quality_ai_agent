@@ -72,7 +72,7 @@ SPECS = [
     (
         "QA-009",
         "검사성적서가 다른 Lot을 가리킴",
-        None,
+        "HOLD",
         "LOT_ID_MISMATCH",
     ),
     (
@@ -229,9 +229,9 @@ def make_case(template, spec):
         inspection["structured_data"]["lot_no"] = "LOT-OTHER-999"
 
         note = (
-            "Lot 불일치 탐지는 필수입니다. "
-            "HOLD/REJECT 선택은 팀 합의 후 확정하며, "
-            "PASS는 허용하지 않습니다."
+            "검사성적서의 Lot 번호가 대상 Lot과 달라 "
+            "대상 Lot의 검사 결과를 확인할 수 없으므로 HOLD합니다. "
+            "올바른 검사성적서 제출 후 재검증합니다."
         )
 
     elif case_id == "QA-010":
@@ -456,8 +456,8 @@ def main():
             "Agent/LLM/판정 함수의 입력으로 전달하지 않습니다.",
             "- QA-002는 영향범위 제외가 정답입니다. "
             "품질 PASS와 구분합니다.",
-            "- QA-009는 판정 미확정이므로 성공/실패 집계에서 "
-            "별도로 구분합니다. 정답 확정 전 자동 합격 처리하지 않습니다.",
+            "- QA-009는 검사성적서 Lot 불일치 시 HOLD로 판정하며, "
+            "올바른 검사성적서 제출 후 재검증합니다.",
             "- QA-010은 문서 Revision 문제와 공차 초과가 동시에 있는 사례입니다. "
             "실제 결과가 HOLD여도 정답을 결과에 맞춰 바꾸지 않습니다.",
             "- evidence의 json_pointer는 같은 Case의 scenario.json 내부 경로입니다. "
@@ -497,7 +497,7 @@ def main():
 
     print(
         "추가 Case 10개 생성 완료: "
-        "정답 정의 9개 / 팀 판정 확인 필요 1개(QA-009)"
+        "정답 정의 10개 / 팀 판정 확인 필요 0개"
     )
     print(
         "자료 조건 점검 완료. "

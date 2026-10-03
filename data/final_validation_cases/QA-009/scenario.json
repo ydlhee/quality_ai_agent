@@ -2,7 +2,7 @@
   "synthetic_fixture": true,
   "case_id": "QA-009",
   "title": "검사성적서가 다른 Lot을 가리킴",
-  "oracle_status": "PENDING_TEAM_DECISION",
+  "oracle_status": "DEFINED",
   "phases": [
     {
       "name": "initial",
@@ -90,7 +90,7 @@
         ]
       },
       "expected": {
-        "decision": null,
+        "decision": "HOLD",
         "issue_code": "LOT_ID_MISMATCH",
         "scope": "IN_EFFECTIVITY_SCOPE"
       }

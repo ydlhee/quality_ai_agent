@@ -667,9 +667,9 @@
     "case_id": "QA-009",
     "title": "검사성적서가 다른 Lot을 가리킴",
     "synthetic_fixture": true,
-    "oracle_status": "PENDING_TEAM_DECISION",
+    "oracle_status": "DEFINED",
     "expected": {
-      "decision": null,
+      "decision": "HOLD",
       "issue_code": "LOT_ID_MISMATCH",
       "scope": "IN_EFFECTIVITY_SCOPE"
     },
@@ -716,7 +716,7 @@
       "within_new_tolerance": true,
       "inspection_lot_matches": false
     },
-    "reason": "Lot 불일치 탐지는 필수입니다. HOLD/REJECT 선택은 팀 합의 후 확정하며, PASS는 허용하지 않습니다.",
+    "reason": "검사성적서의 Lot 번호가 대상 Lot과 달라 대상 Lot의 검사 결과를 확인할 수 없으므로 HOLD합니다. 올바른 검사성적서 제출 후 재검증합니다.",
     "evidence": [
       {
         "document_type": "DRAWING",
