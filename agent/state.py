@@ -29,6 +29,13 @@ def create_initial_state(case_id: str):
         "additional_checks": [],
         "pending_actions": [],
         "plan_adjustments": [],
+        
+        # 동적 계획 및 자율적 실행 관리
+        "execution_plan": [],
+        "completed_actions": [],
+        "plan_revision": 0,
+        "replanning_required": False,
+        "replanning_reason": None,
 
         # Tool 실행 결과 및 Agent 기록
         "tool_results": {},
