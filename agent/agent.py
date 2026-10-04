@@ -15,6 +15,7 @@ AVAILABLE_TOOLS = {
     "impact_trace": "영향범위 추적",
     "plan_review": "추가 검증계획 검토",
     "validate_quality": "품질검증 및 Risk 판단",
+    "replan": "품질검증 결과 기반 동적 계획 재수립",
     "followup": "후속조치",
     "wait": "보완자료 또는 시정조치 자료 수신 대기",
     "finish": "Case 종료",
@@ -65,6 +66,9 @@ def allowed_next_tools(state):
         return independent
     if not state.get("quality_validated"):
         return ["validate_quality"]
+    # 품질검증 이후 동적 재계획을 한 번 수행한다.
+    if not state.get("replanning_completed", False):
+        return ["replan"]
     if state.get("decision") in ("HOLD", "REJECT"):
         return ["wait"] if state.get("followup_completed") else ["followup"]
     if state.get("decision") == "PASS":
@@ -178,3 +182,87 @@ def review_validation_plan(state):
         print(f"[Agent] 검증계획 검토 실패: {type(error).__name__}: {error}")
         return {"additional_checks": [], "reason": "기존 필수 검증계획 유지",
                 "decision_source": "RULE_FALLBACK", "required_documents": sorted(mandatory)}
+
+class ReplanningDecision(BaseModel):
+    """검증 결과를 바탕으로 추가 확인 필요성을 판단한다."""
+
+    replanning_required: bool = Field(
+        description="추가 검증계획 검토가 필요한지 여부"
+    )
+    reason: str = Field(
+        description="검증 결과에 근거한 판단 이유"
+    )
+    suggested_checks: list[AdditionalCheck] = Field(
+        default_factory=list,
+        description="추가로 확인할 문서와 이유"
+    )
+
+
+def replan_from_quality_result(state):
+    """품질검증 결과에 근거해 추가 확인 작업을 제안한다.
+
+    실제 품질 판정이나 필수 검증항목은 변경하지 않는다.
+    """
+    quality = state.get("tool_results", {}).get("quality", {})
+    context = {
+        "decision": state.get("decision"),
+        "missing_items": state.get("missing_items", []),
+        "quality_result": quality.get("result", {}),
+        "existing_additional_checks": state.get("additional_checks", []),
+        "allowed_documents": sorted(ALLOWED_ADDITIONAL_DOCUMENTS),
+    }
+
+    response = _llm().with_structured_output(
+        ReplanningDecision
+    ).invoke([
+        (
+            "system",
+            "당신은 항공기 품질검증 AI Agent입니다. "
+            "품질검증 결과에서 새롭게 발견된 문제를 분석하고 "
+            "추가 확인이 필요한 문서가 있는지 판단하세요. "
+            "이미 확인 중인 문서는 중복 제안하지 마세요. "
+            "필수 검증항목이나 PASS/HOLD/REJECT 판정은 "
+            "절대 변경하지 마세요. "
+            "근거가 부족하면 추가 확인을 제안하지 마세요."
+        ),
+        (
+            "human",
+            json.dumps(context, ensure_ascii=False, default=str)
+        ),
+    ])
+
+    existing = {
+        item["document_type"]
+        for item in state.get("additional_checks", [])
+    }
+
+    mandatory = set(
+        state.get("tool_results", {})
+        .get("validation_plan", {})
+        .get("result", {})
+        .get("required_documents", [])
+    )
+
+    suggestions = []
+    for item in response.suggested_checks:
+        document_type = item.document_type.strip().upper()
+        reason = item.reason.strip()
+
+        if (
+            document_type in ALLOWED_ADDITIONAL_DOCUMENTS
+            and document_type not in existing
+            and document_type not in mandatory
+            and reason
+        ):
+            suggestions.append({
+                "document_type": document_type,
+                "reason": reason,
+            })
+            existing.add(document_type)
+
+    return {
+        "replanning_required": bool(suggestions),
+        "reason": response.reason,
+        "suggested_checks": suggestions,
+        "decision_source": "LLM",
+    }
