@@ -510,14 +510,21 @@ def show_followup(state):
             ),
         )
 
-        request_data = {}
+        action_data = {}
+        draft_data = {}
         actions = (followup.get("result") or {}).get("actions") or []
 
         if actions and isinstance(actions[0], dict):
-            request_data = actions[0].get("request") or {}
+            action_data = actions[0]
+
+            if final_decision == "HOLD":
+                draft_data = action_data.get("request") or {}
+
+            elif final_decision == "REJECT":
+                draft_data = action_data.get("scar_draft") or {}
 
         default_body = (
-            request_data.get("draft_message")
+            draft_data.get("draft_message")
             or followup.get("draft_message")
             or followup.get("message")
             or followup.get("draft")
@@ -674,6 +681,7 @@ def show_history(state):
     st.subheader("Agent 실행 이력")
     for index, item in enumerate(state["history"], start=1):
         st.write(f"{index}. {item}")
+
 
 
 

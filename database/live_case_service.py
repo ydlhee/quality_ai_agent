@@ -1,4 +1,4 @@
-import json
+﻿import json
 
 import re
 
@@ -349,15 +349,6 @@ def validate_new_case_mail(mail_result):
     new_revision = new_data.get("revision")
     inspection_revision = inspection_data.get("revision")
 
-    if (
-        new_revision
-        and inspection_revision
-        and new_revision != inspection_revision
-    ):
-        errors.append(
-            "변경 후 도면 Revision과 검사성적서 Revision이 "
-            "일치하지 않습니다."
-        )
 
     if errors:
         return {
