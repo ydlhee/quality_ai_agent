@@ -1,4 +1,5 @@
 import json
+import time
 from pathlib import Path
 
 from tools.drawing_compare import analyze_design_change
@@ -106,6 +107,9 @@ def run_scenario(path):
 
 def main():
     success = 0
+    execution_times = []
+
+    total_start = time.perf_counter()
 
     for index in range(1, 16):
         name = f"VAL-{index:03d}"
@@ -117,7 +121,9 @@ def main():
             / "scenario.json"
         )
 
-        print(f"\\n===== {name} =====")
+        print(f"\n===== {name} =====")
+
+        case_start = time.perf_counter()
 
         try:
             run_scenario(path)
@@ -130,9 +136,29 @@ def main():
                 f"{type(exc).__name__}: {exc}"
             )
 
+        case_end = time.perf_counter()
+        elapsed = case_end - case_start
+        execution_times.append(elapsed)
+
+        print(f"처리시간: {elapsed:.4f}초")
+
+    total_end = time.perf_counter()
+    total_elapsed = total_end - total_start
+
+    average_time = sum(execution_times) / len(execution_times)
+
+    print("\n==============================")
+    print("성능 테스트 결과")
+    print("==============================")
     print(
-        f"\\n총 15개: PASS {success}, FAIL {15 - success}"
+        f"총 15개: PASS {success}, FAIL {15 - success}"
     )
+    print(f"전체 처리시간: {total_elapsed:.4f}초")
+    print(f"Case당 평균 처리시간: {average_time:.4f}초")
+    print(f"최소 처리시간: {min(execution_times):.4f}초")
+    print(f"최대 처리시간: {max(execution_times):.4f}초")
+    print("==============================")
+
     print(
         "가상 구조화 자료 기반 Tool 테스트입니다. "
         "Gmail/DB 통합 검증은 별도입니다."
