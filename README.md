@@ -96,9 +96,6 @@ python test_validation_cases.py
 - Python 3.12
 - 테스트 환경: Python 3.12.7
 
-Python 3.13 환경에서는 일부 패키지 또는 Windows 보안정책에 따라
-의존성 DLL 로딩 문제가 발생할 수 있으므로 Python 3.12 사용을 권장합니다.
-
 ---
 
 ## 6. 설치 방법
