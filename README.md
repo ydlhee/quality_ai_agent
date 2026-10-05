@@ -135,7 +135,7 @@ OPENAI_MODEL=gpt-4.1-mini
 ### 5) 애플리케이션 실행
 
 ```powershell
-streamlit run app.py
+python -m streamlit run .\app_aerospace_qms_v3.py
 ```
 
 실행 후 표시되는 로컬 Streamlit 주소로 접속합니다.
