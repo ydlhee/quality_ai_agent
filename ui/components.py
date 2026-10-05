@@ -1,4 +1,4 @@
-import streamlit as st
+﻿import streamlit as st
 
 from mail.gmail_sender import (
     send_gmail,
@@ -102,8 +102,8 @@ def show_followup(state):
     Gmail 발송 및 발송상태 영구 복원 UI.
     """
 
-    followup = state.get("followup") or {}
-    final_decision = state.get("final_decision") or "-"
+    followup = (state.get("tool_results") or {}).get("followup") or state.get("followup") or {}
+    final_decision = state.get("final_decision") or state.get("decision") or "-"
     case_id = state.get("case_id") or "-"
 
     st.subheader("05 후속조치 · 재검증")
@@ -510,8 +510,16 @@ def show_followup(state):
             ),
         )
 
+        request_data = {}
+        actions = (followup.get("result") or {}).get("actions") or []
+
+        if actions and isinstance(actions[0], dict):
+            request_data = actions[0].get("request") or {}
+
         default_body = (
-            followup.get("message")
+            request_data.get("draft_message")
+            or followup.get("draft_message")
+            or followup.get("message")
             or followup.get("draft")
             or followup.get("email_body")
             or ""
@@ -666,3 +674,7 @@ def show_history(state):
     st.subheader("Agent 실행 이력")
     for index, item in enumerate(state["history"], start=1):
         st.write(f"{index}. {item}")
+
+
+
+
